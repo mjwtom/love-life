@@ -12,10 +12,17 @@ class MysqlClient(object):
         cursor.close()
         return result
 
-    def insert(self, cmd):
+    def insert(self, sql, data):
         cursor = self.conn.cursor()
-        cursor.execute(cmd)
+        cursor.execute(sql, data)
         cursor.close()
+        self.conn.commit()
+
+    def execute(self, sql):
+        cursor = self.conn.cursor()
+        cursor.execute(sql)
+        cursor.close()
+        self.conn.commit()
 
     def close(self):
         self.conn.close()
