@@ -48,7 +48,7 @@ def structure_insert(instanceId, order_num, metadataId=None):
     client = MysqlClient(conf)
     client.insert(sql, data)
     sql = 'select id from trhz.docinstancestru ' \
-          'where insId = %d and orderNum = %d and addedBy = "majingwei" and metadataId = "%s"' \
+          'where insId = "%s" and orderNum = "%s" and addedBy = "majingwei" and metadataId = "%s"' \
           % (instanceId, order_num, metadataId)
     r = client.select(sql)
     if r:
@@ -59,7 +59,10 @@ def structure_insert(instanceId, order_num, metadataId=None):
 
 def instance_insert(param_map, projectId, init_map=None):
     params = json.dumps(param_map)
-    init = json.dumps(init_map)
+    if init_map:
+        init = json.dumps(init_map)
+    else:
+        init = None
     data = ('1',
             '2',
             'test',
@@ -84,8 +87,8 @@ def instance_insert(param_map, projectId, init_map=None):
     client = MysqlClient(conf)
     client.insert(sql, data)
     sql = 'select id from trhz.docinstance where params = \'%s\' and addedBy = "majingwei"' \
-          ' and projectId = "%s" and metadata = \'%s\'' \
-          % (params, projectId, init)
+          ' and projectId = "%s"' \
+          % (params, projectId)
     r = client.select(sql)
     if r:
         return r[0][0]
