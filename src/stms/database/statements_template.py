@@ -45,13 +45,13 @@ def structure_insert(instanceId, pid, order_num, code, level,
             digest,
             1013,
             '0')
-    sql = 'INSERT INTO trhz.docinstancestru ' \
-          '(pId, insId, orderNum, struSign, struLevel, metadataId, struName, struDigest, addedBy, deleted) ' \
+    sql = 'INSERT INTO trhz.doctemplatestru ' \
+          '(pId, tplId, orderNum, struSign, struLevel, metadataId, struName, struDigest, addedBy, deleted) ' \
           'VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     client = MysqlClient(conf)
     client.insert(sql, data)
-    sql = 'select id from trhz.docinstancestru ' \
-          'where insId = %d and orderNum = %d and addedBy = 1013' \
+    sql = 'select id from trhz.doctemplatestru ' \
+          'where tplId = %d and orderNum = %d and addedBy = 1013' \
           % (instanceId, order_num)
     r = client.select(sql)
     client.close()
@@ -69,31 +69,22 @@ def instance_insert(param_map, projectId, id=None, init_map=None):
         init = None
     data = (id,
             '1',
-            '2',
             'test',
             'test',
-            'test',
-            'test',
-            params,
-            projectId,
             1013,
             1013,
             '0',
-            init,
-            'test.docx',
             '2016-09-22 17:37:04',
             '2016-09-22 17:37:04'
             )
-    sql = 'INSERT INTO trhz.docinstance' \
-          '(id, libId, tplId, insName, insDigest, identifier, version, params, projectId,' \
-          'addedBy, editedBy, deleted, metadata, physicalFileName, addedTime, editedTime) ' \
+    sql = 'INSERT INTO trhz.doctemplate' \
+          '(id, libId, tplName, tplDigest,' \
+          'addedBy, editedBy, deleted, addedTime, editedTime) ' \
           'VALUES ' \
-          '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+          '(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
     client = MysqlClient(conf)
     client.insert(sql, data)
-    sql = 'select id from trhz.docinstance where params = \'%s\' and addedBy = 1013' \
-          ' and projectId = %d' \
-          % (params, projectId)
+    sql = 'select id from trhz.doctemplate where addedBy = 1013'
     r = client.select(sql)
     client.close()
     if r:
@@ -103,12 +94,12 @@ def instance_insert(param_map, projectId, id=None, init_map=None):
 
 
 def clean_instance():
-    sql = 'delete from trhz.docinstance where addedBy = 1013'
+    sql = 'delete from trhz.doctemplate where addedBy = 1013'
     return sql
 
 
 def clean_structure():
-    sql = 'delete from trhz.docinstancestru where addedBy = 1013'
+    sql = 'delete from trhz.doctemplatestru where addedBy = 1013'
     return sql
 
 
