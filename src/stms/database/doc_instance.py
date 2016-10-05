@@ -1,24 +1,45 @@
-from statements_template import instance_insert, metadata_insert, structure_insert, \
-    clean_instance, clean_structure, clean_metadata, instance_insert
+from statements_template import template_insert, metadata_insert, template_structure_insert, \
+    get_break_page_metada_id, get_table_of_content_metada_id
+from statements import instance_insert, structure_insert
 
 
 class DocInstance(object):
-    def __init__(self, params, project_id):
+    def __init__(self, params, project_id, name='test',
+                 digest='test', is_template=False):
         self.order_num = 0
         self.headers_id = []
-        self.instance_id = instance_insert(params, project_id)
-        self._insert_root()
+        self.name = name
+        if is_template:
+            self.instance_id = template_insert(name, digest)
+        else:
+            self.instance_id = instance_insert(params, project_id, name, digest)
+        self.is_template = is_template
+        self._insert_root(name+'的root节点', digest+'的root节点')
 
-    def _insert_root(self):
-        structure_id = structure_insert(self.instance_id,
+    def _insert_root(self, name='root', digest='document root'):
+        if self.is_template:
+            structure_id = template_structure_insert(self.instance_id,
+                                                     -1,
+                                                     -1,
+                                                     '1', 0,
+                                                     name, digest)
+        else:
+            structure_id = structure_insert(self.instance_id,
                                         -1,
-                                        self.order_num,
-                                        0, '1', 2,
-                                        'root', 'document root');
+                                        -1,
+                                        '1', 0,
+                                        name, digest)
         self.headers_id.append(structure_id)
 
     def _insert_structure(self, level, sign, name, digest, metadata_id):
-        structure_id = structure_insert(self.instance_id,
+        if self.is_template:
+            structure_id = template_structure_insert(self.instance_id,
+                                                     self.headers_id[level-1],
+                                                     self.order_num, sign,
+                                                     level, name, digest,
+                                                     metadata_id)
+        else:
+            structure_id = structure_insert(self.instance_id,
                          self.headers_id[level - 1],
                          self.order_num, sign, level,
                          name, digest, metadata_id);
@@ -27,38 +48,43 @@ class DocInstance(object):
                 self.headers_id.append(structure_id)
             else:
                 self.headers_id[level] = structure_id
+        print('structure order %d' % self.order_num)
         self.order_num += 1
 
     def insert_header(self, level, text):
         self._insert_structure(level, '1', text,
-                               '文档%d的第%d级标题'
-                               % (self.instance_id, level),
+                               '文档%s的第%d级标题'
+                               % (self.name, level),
                                None)
 
     def insert_text(self, text):
         self._insert_structure(len(self.headers_id),
                                '2',
-                               '文档%d的文本' % self.instance_id,
+                               '文档%s的文本' % self.name,
                                text, None)
 
-    def insert_mt_structure(self, class_name, method_name, params):
+    def insert_mt_structure(self, class_name, method_name, params, name, digest):
         metadata_map = dict(
             className=class_name,
             methodName=method_name,
             params=params
         )
-        metadata_id = metadata_insert(metadata_map)
+        metadata_id = metadata_insert(metadata_map, name, digest)
         self._insert_structure(len(self.headers_id),
                                '2',
-                               '带有metadata的项目',
-                               '带有metadata的项目digest', metadata_id)
+                               name,
+                               digest, metadata_id)
 
     def insert_toc(self):
-        self.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                 'getSimpleToC',
-                                 None);
+        id = get_table_of_content_metada_id()
+        self._insert_structure(len(self.headers_id),
+                               '2',
+                               '文档%s的目录' % self.name,
+                               '文档%s的目录' % self.name, id)
 
     def insert_break_page(self):
-        self.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                 'getBreakPage',
-                                 None);
+        id = get_break_page_metada_id()
+        self._insert_structure(len(self.headers_id),
+                               '2',
+                               '文档%s的分页符' % self.name,
+                               '文档%s的分页符' % self.name, id)
