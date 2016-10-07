@@ -14,7 +14,7 @@ def insert_spec(is_template):
                                      '【测试说明】测试说明首页',
                                      '测试说明首页')
     doc_instance.insert_toc()
-    doc_instance.insert_break_page()
+    #doc_instance.insert_break_page()
     doc_instance.insert_header(1, "范围")
     doc_instance.insert_text("a）已批准的文档标识号：${_instance_identifier}")
     doc_instance.insert_text("b）标题：${_product_softwareName}测试说明")

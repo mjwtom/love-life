@@ -1,60 +1,38 @@
 from doc_instance import DocInstance
 
 
-def insert_problem(is_template=False):
-    param_map = dict(
-        projectId="13",
-        testTurn="1"
-    )
-    doc_instance = DocInstance(param_map, 13, '软件问题确认报告单',
-                               '软件问题确认报告单模板',is_template)
-    doc_instance.insert_mt_structure('com.stms.tps.doc.form.ProblemConfirmReport',
-                                     'getDocxXml',
-                                     ['projectId', 'turnId'],
-                                     '软件问题确认报告单',
-                                     '软件问题确认报告读取的元数据')
-    print(doc_instance.instance_id)
-
-
-def insert_softwareinout(is_template=False):
-    param_map = dict(
-        projectId="13",
-        testTurn="1"
-    )
-    doc_instance = DocInstance(param_map, 13, '被测软件出入登记表',
-                               '被测软件出入登记表模板', is_template)
-    doc_instance.insert_mt_structure('com.stms.tps.doc.form.SoftwareInOut',
-                                     'getDocxXml',
-                                     ['projectId', 'turnId'],
-                                     '软件问题确认报告单',
-                                     '软件问题确认报告读取的元数据')
-    print(doc_instance.instance_id)
-
-
 def insert_test_report(is_template=False):
     param_map = dict(
         projectId="13",
         testTurn="1"
     )
 
-    doc_instance = DocInstance(param_map, 13, '软件测试报告',
-                               '软件测试报告', is_template)
+    doc_instance = DocInstance(param_map, 13, '【测评报告】软件测试报告',
+                               '软件测评报告', is_template)
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getFrontPages',
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试报告首页', '测试报告首页')
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
+                                     'getRevisionHistory',
+                                     ['projectId', 'turnId'],
+                                     '【测试报告】修订历史记录', '修订历史记录')
     doc_instance.insert_break_page()
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
+                                     'getDeclaration',
+                                     None,
+                                     '【测试报告】有效性声明', '有效性声明')
     doc_instance.insert_toc()
-    doc_instance.insert_break_page()
+    #doc_instance.insert_break_page()
     doc_instance.insert_header(1, '范围')
     doc_instance.insert_header(2, '标识')
-    doc_instance.insert_text('1) 文档标识号：XXXX-RJCP-CPDG-XXXX 。')
-    doc_instance.insert_text('2) 标题： YYYYYYYY软件定型/鉴定测评大纲 。')
-    doc_instance.insert_text('3) 被测件：YYYYYYYY软件 ，各软件配置项信息及标识见表1-1。')
+    doc_instance.insert_text('1) 文档标识号：${_instance_identifier}。')
+    doc_instance.insert_text('2) 标题： ${_product_softwareName}定型/鉴定测评报告。')
+    doc_instance.insert_text('3) 适用的软件及版本：${_product_systemName}${_product_softwareName}。')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getVersionInformation',
                                      ['projectId', 'turnId'],
-                                     '版本信息', '版本信息')
+                                     '【测试报告】版本信息', '测试报告版本信息')
     doc_instance.insert_text('4)术语和缩略语')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTerms',
@@ -64,25 +42,29 @@ def insert_test_report(is_template=False):
     doc_instance.insert_text('本文档内容包括：1.范围；2.引用文档；3.测评概述；4.测试结果；5.评价结论与改进建议；6.其他。')
     doc_instance.insert_text('文档标识本文档适用于XXXXXXXX系统YYYYYYYY软件定型/鉴定 测评，是XXXXXXXX系统YYYYYYYY软件定型/鉴定 的依据 。')
     doc_instance.insert_header(2,'委托方的名称与联系方式')
-    doc_instance.insert_text('委托方的名称：海定委办公室；\n'
-                            '委托方地址：XXXXXXXXXX；\n'
-                            '委托方联系人：XXX；\n'
-                            '委托方联系人电话：010-XXXXXX。')
+    doc_instance.insert_text('委托方的名称：${xxxx}；')
+    doc_instance.insert_text('委托方地址：XXXXXXXXXX；')
+    doc_instance.insert_text('委托方联系人：XXX；')
+    doc_instance.insert_text('委托方联系人电话：010-XXXXXX。')
+    #
     doc_instance.insert_header(2, '承研单位的名称与联系方式 ')
-    doc_instance.insert_text('承研单位名称：XXXXXXXXXX；\n'
-                            '承研单位地址：XXXXXXXXXX；\n'
-                            '承研单位联系人：XXX；\n'
-                            '承研单位联系人电话：XXX-XXXXXX。')
+    doc_instance.insert_text('承研单位名称：${_project_partAOrgName}；')
+    doc_instance.insert_text('承研单位地址：${_project_partAOrgAddress}；')
+    doc_instance.insert_text('承研单位联系人：${_project_partAOrgManager}；')
+    doc_instance.insert_text('承研单位联系人电话：${_project_partAOrgManagerPN}。')
     doc_instance.insert_header(2, '定型/鉴定 测评机构的名称与联系方式')
-    doc_instance.insert_text('定型测评机构名称：中国船舶工业软件测试中心；\n'
-                            '定型测评机构地址：江苏省连云港市圣湖路18号；\n'
-                            '定型测评机构联系人：孙志安；\n'
-                            '定型测评机构联系人电话：18036671781。\n')
-    doc_instance.insert_header(2, '被测软件概述')
+    doc_instance.insert_text('定型测评机构名称：中国船舶工业软件测试中心；')
+    doc_instance.insert_text('定型测评机构地址：江苏省连云港市圣湖路18号；')
+    doc_instance.insert_text('定型测评机构联系人：孙志安；')
+    doc_instance.insert_text('定型测评机构联系人电话：18036671781。')
+    #
+    #doc_instance.insert_header(2, '被测软件概述')
+    #以下自动迭代生成被测软件概述
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTpsProductSpec',
                                      ['projectId', 'turnId'],
-                                     '被测软件概述', '被测软件概述')
+                                     '【测试报告】被测软件概述', '【测试报告】被测软件概述')
+    #以下是引用文件
     doc_instance.insert_header(1, '引用文件')
     doc_instance.insert_header(2, '管理类文件')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
@@ -104,21 +86,27 @@ def insert_test_report(is_template=False):
                                      'getOtherDocuments',
                                      ['projectId', 'turnId'],
                                      '【测试报告】其他文档', '其他文档')
+    #测评概述
     doc_instance.insert_header(1, '测评概述')
     doc_instance.insert_header(2, '测评过程概述')
     doc_instance.insert_text('软件定型 / 鉴定'
                         '测评工作分为测试需求分析、测试策划、测试设计和实现、测试执行、测试总结五个测试阶段进行，测试的主要时间节点及工作内容见表3 - 1。此次定型 / 鉴定'
-                        '测评分包单位为XXXX，承担UUUU软件测评工作。')
+                        '测评分包单位为XXXX，承担${_product_softwareName}测评工作。')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getNodeAndWorkContent',
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试主要节点及工作内容', '测试主要节点及工作内容')
+
+    #测评环境说明
     doc_instance.insert_header(2, '测评环境说明')
+    #以下调用函数，自动生成测试环境
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTestEnvironment',
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试环境',
                                      '测试环境说明')
+
+    #测评方法说明
     doc_instance.insert_header(2, '测评方法说明')
     doc_instance.insert_header(3, '测试方法')
     doc_instance.insert_text('测试组选取的测试类型和测试方法要求详见表3-12。')
@@ -127,6 +115,8 @@ def insert_test_report(is_template=False):
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试类型及测试方法',
                                      '测试类型及测试方法表格')
+
+    #测试工具
     doc_instance.insert_header(3, '测试工具')
     doc_instance.insert_text('测试工具详见表3-13。')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
@@ -134,6 +124,8 @@ def insert_test_report(is_template=False):
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试工具说明表格',
                                      '测试工具说明表格')
+
+    #测试结果
     doc_instance.insert_header(1, '测试结果')
     doc_instance.insert_header(2, '测试执行情况')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
@@ -141,6 +133,8 @@ def insert_test_report(is_template=False):
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试结果执行情况总汇',
                                      '测试结果执行情况总汇')
+
+    #以下是测试问题
     doc_instance.insert_header(2, '软件问题')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getSoftwareProblem',
@@ -166,8 +160,8 @@ def insert_test_report(is_template=False):
     doc_instance.insert_text('（3）测试过程中，严格按照有关的保密要求开展工作，确保被测件、测试产品的安全；')
     doc_instance.insert_text('（4）测试过程中，测试工具及测试设备完好；')
     text = '（5）根据《XX研制总要求 》和软件承制方提供的被测软件需求规格说明和设计文档，整理出XX个软件需求，XX个隐含需求。由软件需求分析出XX个测试需求，其中文档审查需求XX个，静态测试需求XX个，功能测试需求XX个，性能测试需求XX个，接口测试需求XX个，余量测试需求XX个，边界测试需求XX个，'\
-            '人机界面测试XX个，强度测试XX个，安全性测试XX个，…… 。'\
-            '测试需求覆盖了《XX研制总要求 》中关于软件的要求和软件需求规格说明及其他等效文档中关于软件功能、性能等全部的书面需求和隐含需求。编写测试用例表单XX组，覆盖全部软件测试需求。'\
+            '人机界面测试XX个，强度测试XX个，安全性测试XX个，…… 。' \
+            '测试需求覆盖了《XX研制总要求 》中关于软件的要求和软件需求规格说明及其他等效文档中关于软件功能、性能等全部的书面需求和隐含需求。编写测试用例表单XX组，覆盖全部软件测试需求。' \
             '用例执行情况见附录C。'
     doc_instance.insert_text(text)
     doc_instance.insert_header(1, '评价结论与改进建议')

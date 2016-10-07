@@ -9,6 +9,7 @@ class DocInstance(object):
         self.order_num = 0
         self.headers_id = []
         self.name = name
+        self.last_level = -1
         if is_template:
             self.instance_id = template_insert(name, digest)
         else:
@@ -30,6 +31,7 @@ class DocInstance(object):
                                         '1', 0,
                                         name, digest)
         self.headers_id.append(structure_id)
+        self.last_level += 1
 
     def _insert_structure(self, level, sign, name, digest, metadata_id):
         if self.is_template:
@@ -42,12 +44,13 @@ class DocInstance(object):
             structure_id = structure_insert(self.instance_id,
                          self.headers_id[level - 1],
                          self.order_num, sign, level,
-                         name, digest, metadata_id);
+                         name, digest, metadata_id)
         if sign == '1':
             if len(self.headers_id) <= level:
                 self.headers_id.append(structure_id)
             else:
                 self.headers_id[level] = structure_id
+            self.last_level = level
         print('structure order %d' % self.order_num)
         self.order_num += 1
 
@@ -58,7 +61,7 @@ class DocInstance(object):
                                None)
 
     def insert_text(self, text):
-        self._insert_structure(len(self.headers_id),
+        self._insert_structure(self.last_level+1,
                                '2',
                                '文档%s的文本' % self.name,
                                text, None)
@@ -70,7 +73,7 @@ class DocInstance(object):
             params=params
         )
         metadata_id = metadata_insert(metadata_map, name, digest)
-        self._insert_structure(len(self.headers_id),
+        self._insert_structure(self.last_level+1,
                                '2',
                                name,
                                digest, metadata_id)
