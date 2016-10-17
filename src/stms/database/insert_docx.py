@@ -3,6 +3,7 @@ from statements_template import clean_template, clean_template_structure, clean_
 from statements import clean_instance, clean_structure
 from statements import conf
 from documents.test_spec import insert_spec
+from documents.test_record import insert_test_record
 from documents.test_report import insert_test_report
 
 
@@ -22,7 +23,9 @@ def clean():
 
 
 def insert_doc(is_template=False):
-    doc_id = insert_test_report(is_template)
+    #doc_id = insert_test_report(is_template)
+    doc_id = insert_test_record(is_template)
+    #doc_id = insert_spec(is_template)
     if is_template:
         print('document template id is: %d' % doc_id)
     else:
@@ -31,9 +34,4 @@ def insert_doc(is_template=False):
 
 if __name__ == '__main__':
     clean()
-    #insert_problem()
-    #insert_softwareInOut(True)
-    #insert_test_report(True)
-    #insert_test_record(True)
     insert_doc(True)
-    #insert_problem_confirmation()

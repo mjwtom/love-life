@@ -15,13 +15,13 @@ def insert_test_record(is_template=False):
                                      '测试记录首页')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestRecordImpl',
                                      'getTestRecords',
-                                     ['projectId', 'turnId', 'testItemId'],
+                                     ['projectId', 'turnId'],
                                      '【测试记录】软件测试记录表格',
                                      '软件测试记录表格')
     doc_instance.insert_break_page()
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestRecordImpl',
                                      'getTestCenterTestRecords',
-                                     ['projectId', 'turnId', 'testItemId'],
+                                     ['projectId', 'turnId'],
                                      '【测试记录】软件测试中心测试记录',
                                      '软件测试中心测试记录')
     return doc_instance.instance_id

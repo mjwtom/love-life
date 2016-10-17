@@ -24,5 +24,11 @@ class MysqlClient(object):
         cursor.close()
         self.conn.commit()
 
+    def execute_data(self, sql, data):
+        cursor = self.conn.cursor()
+        cursor.execute(sql, data)
+        cursor.close()
+        self.conn.commit()
+
     def close(self):
         self.conn.close()
