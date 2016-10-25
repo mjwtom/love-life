@@ -1,6 +1,30 @@
 #!/usr/bin/env python
 from db_util import MysqlClient
 from statements import conf
+import json
+
+
+def de_duplication_metadata():
+    client = MysqlClient(conf)
+    sql = 'SELECT id, url FROM trhz.docmetadata'
+    r = client.select(sql)
+    dup = []
+    collect = set()
+    for id, url in r:
+        if not url:
+            dup.append(id)
+            continue
+        url = set(json.loads(url))
+        if url not in collect:
+            collect.add(id)
+        else:
+            dup.append(id)
+    for id in dup:
+        info = 'deleting %d from trhz.docmetadata' % (id)
+        print(info)
+        sql = 'DELETE FROM trhz.docmetadata WHERE id=%d' % (id)
+        client.execute(sql)
+    client.close()
 
 
 def clean_metadata():
@@ -54,6 +78,7 @@ def clean_doc_template_structure():
 
 
 def clean_all():
+    de_duplication_metadata()
     clean_doc_instance_structure()
     clean_doc_template_structure()
     clean_metadata()

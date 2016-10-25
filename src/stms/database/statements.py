@@ -20,13 +20,13 @@ def get_property_id(client, table_name):
     ids.sort()
     if len(ids) == 0:
         return 0
-    pre = 0
-    cur = ids.pop(0)
-    while cur is not None:
+    cur = 0
+    pre = cur
+    while ids:
+        cur = ids.pop(0)
         if cur-pre > 1:
             return pre+1
         pre = cur
-        cur = ids.pop(0)
     return cur+1
 
 
@@ -56,12 +56,10 @@ def structure_insert(instanceId, pid, order_num, code, level,
           % (instanceId, order_num)
     r = client.select(sql)
     client.close()
-    if id != r[0][0]:
+    ids = [id for id, in r]
+    if id not in ids:
         print('wrong id')
-    if r:
-        return r[0][0]
-    else:
-        return None
+    return id
 
 
 def instance_insert(param_map, projectId, name='test',
@@ -101,12 +99,10 @@ def instance_insert(param_map, projectId, name='test',
           % (params, projectId)
     r = client.select(sql)
     client.close()
-    if id != r[0][0]:
+    ids = [id for id, in r]
+    if id not in ids:
         print('wrong id')
-    if r:
-        return r[0][0]
-    else:
-        return None
+    return id
 
 
 def clean_instance():

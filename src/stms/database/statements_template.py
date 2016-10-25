@@ -24,12 +24,10 @@ def metadata_insert(map, name='test', digest='test', id=None):
           % (name, digest, url)
     r = client.select(sql)
     client.close()
-    if id != r[0][0]:
+    ids = [id for id, in r]
+    if id not in ids:
         print('wrong id')
-    if r:
-        return r[0][0]
-    else:
-        return None
+    return id
 
 
 #code '1'章节 '2'正文
@@ -54,16 +52,14 @@ def template_structure_insert(tpl_id, pid, order_num, code, level,
           'VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     client.insert(sql, data)
     sql = 'select id from trhz.doctemplatestru ' \
-          'where tplId = %d and orderNum = %d and addedBy = 1013' \
-          % (tpl_id, order_num)
+          'where tplId = %d and orderNum = %d and addedBy = 1013 and pid=%d' \
+          % (tpl_id, order_num, pid)
     r = client.select(sql)
     client.close()
-    if id != r[0][0]:
+    ids = [id for id, in r]
+    if id not in ids:
         print("wrong id")
-    if r:
-        return r[0][0]
-    else:
-        return None
+    return id
 
 
 def template_insert(name, digest, id=None):
@@ -89,12 +85,10 @@ def template_insert(name, digest, id=None):
     sql = 'select id from trhz.doctemplate where addedBy = 1013'
     r = client.select(sql)
     client.close()
-    if id != r[0][0]:
+    ids = [id for id, in r]
+    if id not in ids:
         print('wrong id')
-    if r:
-        return r[0][0]
-    else:
-        return None
+    return id
 
 
 def get_break_page_metada_id():

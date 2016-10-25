@@ -23,9 +23,17 @@ def clean():
 
 
 def insert_doc(is_template=False):
-    #doc_id = insert_test_report(is_template)
+    doc_id = insert_test_report(is_template)
+    if is_template:
+        print('document template id is: %d' % doc_id)
+    else:
+        print('document instance id is: %d' % doc_id)
     doc_id = insert_test_record(is_template)
-    #doc_id = insert_spec(is_template)
+    if is_template:
+        print('document template id is: %d' % doc_id)
+    else:
+        print('document instance id is: %d' % doc_id)
+    doc_id = insert_spec(is_template)
     if is_template:
         print('document template id is: %d' % doc_id)
     else:
@@ -33,5 +41,5 @@ def insert_doc(is_template=False):
 
 
 if __name__ == '__main__':
-    clean()
+    #clean()
     insert_doc(True)
