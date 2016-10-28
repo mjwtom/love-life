@@ -16,6 +16,7 @@ def get_bf_test():
                 prefetch_count = 0
                 sum_identification = 0.0
                 identification_count = 0
+                bf_false_positive_rate = 0.0
                 for i in range(10):
                     file_name = 'finger-'+data+'-4k-batch-dedupe-'+method+'-'+bf+('-%d'%i)+'.txt'
                     file_path = os.path.join(base_dir, file_name)
@@ -35,7 +36,12 @@ def get_bf_test():
                         # print(text)
                         sum_identification += identification
                         identification_count += 1
+                    rate = get_false_posivie_rate(file_path)
+                    if rate != 0.0:
+                        bf_false_positive_rate = rate
                 print(bf, data, method, ':')
+                text = 'bloom filter false positive rate: %e' % bf_false_positive_rate
+                print(text)
                 text = 'average on disk lookup time: %f' % (sum_on_disk_lookup / on_disk_lookup_count)
                 print(text)
                 text = 'average prefetching time: %f' % (sum_prefetch / prefetch_count)
@@ -69,6 +75,26 @@ def get_data(file_path):
                 data = line.split()
                 identification = float(data[-1])
     return on_disk_lookup, prefetch, identification
+
+
+def get_false_posivie_rate(file_path):
+    bf_hit_num = 0
+    dup_num = 0
+    # if file not exist
+    if not os.path.exists(file_path):
+        return 0.0
+
+    with open(file_path) as f:
+        for line in f:
+            if line.startswith('bloom filter hit times'):
+                data = line.split()
+                bf_hit_num = float(data[-1])
+            elif line.startswith('dup_num is'):
+                data = line.split()
+                dup_num = float(data[-1])
+    if bf_hit_num == 0.0:
+        return 0.0
+    return float(bf_hit_num-dup_num)/bf_hit_num
 
 
 def get_fslhomes_data():
