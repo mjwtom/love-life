@@ -7,18 +7,38 @@ conf = dict(
     user='trhz',
     password='zhimakaimen',
     port=3306,
-    database='trhz',
+    database='trhzuuid',
     charset='utf8'
 )
 
 
+def empty_instance(instance_id):
+    client = MysqlClient(conf)
+    sql = 'SELECT id FROM docinstance WHERE id=\'%s\'' % instance_id
+    r = client.select(sql)
+    ids = [id for id, in r]
+    if instance_id not in ids:
+        client.close()
+        return None
+    sql = 'SELECT id FROM docinstancestru WHERE insId=\'%s\'' % instance_id
+    r = client.select(sql)
+    ids = [id for id, in r]
+    for structure_id in ids:
+        sql = 'DELETE FROM docinstancestru WHERE id=\'%s\'' % structure_id
+        client.execute(sql)
+    client.close()
+    return instance_id
+
+
 def get_property_id(client, table_name):
-    id = uuid.uuid4()
+    id = uuid.uuid4().hex
     sql = 'SELECT id FROM %s' % table_name
     result = client.select(sql)
-    while id in result:
-        id = uuid.uuid4()
+    ids = [id for id, in result]
+    while id in ids:
+        id = uuid.uuid4().hex
         result = client.select(sql)
+        ids = [id for id, in result]
     return id
 
 
@@ -46,7 +66,7 @@ def structure_insert(instanceId, pid, order_num, code, level,
                      name, digest, metadataId=None, id=None):
     client = MysqlClient(conf)
     if not id:
-        id = get_property_id(client, 'trhz.docinstancestru')
+        id = get_property_id(client, 'docinstancestru')
     data = (id,
             pid,
             instanceId,
@@ -58,12 +78,12 @@ def structure_insert(instanceId, pid, order_num, code, level,
             digest,
             1013,
             '0')
-    sql = 'INSERT INTO trhz.docinstancestru ' \
+    sql = 'INSERT INTO docinstancestru ' \
           '(id, pId, insId, orderNum, struSign, struLevel, metadataId, struName, struDigest, addedBy, deleted) ' \
           'VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     client.insert(sql, data)
-    sql = 'select id from trhz.docinstancestru ' \
-          'where insId = %d and orderNum = %d and addedBy = 1013' \
+    sql = 'SELECT id FROM docinstancestru ' \
+          'WHERE insId = %d AND orderNum = %d AND addedBy = 1013' \
           % (instanceId, order_num)
     r = client.select(sql)
     client.close()
@@ -82,7 +102,7 @@ def instance_insert(param_map, projectId, name='test',
         init = None
     client = MysqlClient(conf)
     if not id:
-        id = get_property_id(client, 'trhz.docinstance')
+        id = get_property_id(client, 'docinstance')
     data = (id,
             1,
             name,
@@ -99,14 +119,14 @@ def instance_insert(param_map, projectId, name='test',
             '2016-09-22 17:37:04',
             '2016-09-22 17:37:04'
             )
-    sql = 'INSERT INTO trhz.docinstance' \
+    sql = 'INSERT INTO docinstance' \
           '(id, tplId, insName, insDigest, identifier, version, params, projectId,' \
           'addedBy, editedBy, deleted, metadata, physicalFileName, addedTime, editedTime) ' \
           'VALUES ' \
           '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     client.insert(sql, data)
-    sql = 'select id from trhz.docinstance where params = \'%s\' and addedBy = 1013' \
-          ' and projectId = %d' \
+    sql = 'SELECT id FROM docinstance WHERE params = \'%s\' AND addedBy = 1013' \
+          ' AND projectId = %d' \
           % (params, projectId)
     r = client.select(sql)
     client.close()
@@ -117,15 +137,15 @@ def instance_insert(param_map, projectId, name='test',
 
 
 def clean_instance():
-    sql = 'delete from trhz.docinstance where addedBy = 1013'
+    sql = 'delete from docinstance where addedBy = 1013'
     return sql
 
 
 def clean_structure():
-    sql = 'delete from trhz.docinstancestru where addedBy = 1013'
+    sql = 'delete from docinstancestru where addedBy = 1013'
     return sql
 
 
 def clean_metadata():
-    sql = 'delete from trhz.docmetadata where addedBy = 1013'
+    sql = 'delete from docmetadata where addedBy = 1013'
     return sql

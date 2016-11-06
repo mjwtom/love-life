@@ -1,14 +1,14 @@
 from doc_instance import DocInstance
 
 
-def insert_test_report(is_template=False):
+def insert_test_report(is_template=False, instance_id=None):
     param_map = dict(
         projectId="13",
         testTurn="1"
     )
 
     doc_instance = DocInstance(param_map, 13, '【测评报告】软件测试报告',
-                               '软件测评报告', is_template)
+                               '软件测评报告', is_template, instance_id)
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getFrontPages',
                                      ['projectId', 'turnId'],
@@ -39,8 +39,10 @@ def insert_test_report(is_template=False):
                                      ['projectId', 'turnId'],
                                      '【测试报告】术语和缩略语', '术语和缩略语')
     doc_instance.insert_header(2, '文档概述')
-    doc_instance.insert_text('本文档内容包括：1.范围；2.引用文档；3.测评概述；4.测试结果；5.评价结论与改进建议；6.其他。')
-    doc_instance.insert_text('文档标识本文档适用于XXXXXXXX系统YYYYYYYY软件定型/鉴定 测评，是XXXXXXXX系统YYYYYYYY软件定型/鉴定 的依据 。')
+    doc_instance.insert_text('本文档内容包括：1.范围；2.引用文档；3.测评概述；'
+                             '4.测试结果；5.评价结论与改进建议；6.其他。')
+    doc_instance.insert_text('文档标识本文档适用于${_product_systemName}${_product_softwareName}定型/鉴定 测评，'
+                             '是${_product_systemName}${_product_softwareName}定型/鉴定 的依据 。')
     doc_instance.insert_header(2,'委托方的名称与联系方式')
     doc_instance.insert_text('委托方的名称：${xxxx}；')
     doc_instance.insert_text('委托方地址：XXXXXXXXXX；')
@@ -57,8 +59,8 @@ def insert_test_report(is_template=False):
     doc_instance.insert_text('定型测评机构地址：江苏省连云港市圣湖路18号；')
     doc_instance.insert_text('定型测评机构联系人：孙志安；')
     doc_instance.insert_text('定型测评机构联系人电话：18036671781。')
-    #
-    #doc_instance.insert_header(2, '被测软件概述')
+    # 被测软件概述
+    doc_instance.insert_header(2, '被测软件概述')
     #以下自动迭代生成被测软件概述
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTpsProductSpec',
@@ -71,7 +73,7 @@ def insert_test_report(is_template=False):
                                      'getManagementDocuments',
                                      ['projectId', 'turnId'],
                                      '【测试报告】管理类文件表格', '管理类文件表格')
-    doc_instance.insert_header(2,'顶层文件')
+    doc_instance.insert_header(2,'顶层技术文件')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTopTechnologyDocuments',
                                      ['projectId', 'turnId'],
@@ -211,4 +213,4 @@ def insert_test_report(is_template=False):
                                      '【测试报告】用例执行情况一览表',
                                      '用例执行情况一览表')
 
-    return doc_instance.instance_id
+    print(doc_instance.instance_id)

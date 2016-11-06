@@ -1,19 +1,28 @@
 from statements_template import template_insert, metadata_insert, template_structure_insert, \
-    get_break_page_metada_id, get_table_of_content_metada_id
-from statements import instance_insert, structure_insert
+    get_break_page_metada_id, get_table_of_content_metada_id, empty_template
+from statements import instance_insert, structure_insert, empty_instance
 
 
 class DocInstance(object):
     def __init__(self, params, project_id, name='test',
-                 digest='test', is_template=False):
+                 digest='test', is_template=False, instance_id=None):
+        exist = False
+        if instance_id:
+            if is_template:
+                exist = empty_template(instance_id)
+            else:
+                exist = empty_instance(instance_id)
         self.order_num = 0
         self.headers_id = []
         self.name = name
         self.last_level = -1
-        if is_template:
-            self.instance_id = template_insert(name, digest)
+        if not exist:
+            if is_template:
+                self.instance_id = template_insert(name, digest, instance_id)
+            else:
+                self.instance_id = instance_insert(params, project_id, name, digest, instance_id)
         else:
-            self.instance_id = instance_insert(params, project_id, name, digest)
+            self.instance_id = exist
         self.is_template = is_template
         self._insert_root(name+'的root节点', digest+'的root节点')
 

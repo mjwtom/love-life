@@ -1,13 +1,13 @@
 from doc_instance import DocInstance
 
 
-def insert_regression_plan(is_template):
+def insert_regression_plan(is_template, instance_id=None):
     param_map = dict(
         projectId="13",
         testTurn="1"
     )
     doc_instance = DocInstance(param_map, 13, '回归测试计划',
-                               '回归测试计划', is_template)
+                               '回归测试计划', is_template, instance_id)
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionPlan',
                                      'getFrontPages',
                                      ['projectId', 'turnId'],
@@ -146,4 +146,4 @@ def insert_regression_plan(is_template):
                                      ['projectId', 'turnId'],
                                      '【回归测试计划】管理记录一览表',
                                      '回归测试计划管理记录一览表')
-    return doc_instance.instance_id
+    print(doc_instance.instance_id)

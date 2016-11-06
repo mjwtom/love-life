@@ -5,6 +5,9 @@ from statements import conf
 from documents.test_spec import insert_spec
 from documents.test_record import insert_test_record
 from documents.test_report import insert_test_report
+from documents.regression_record import insert_regression_record
+from documents.regression_plan import insert_regression_plan
+from documents.regression_spec import insert_regression_spec
 
 
 def clean():
@@ -21,25 +24,12 @@ def clean():
     client.execute(sql)
     client.close()
 
-
-def insert_doc(is_template=False):
-    doc_id = insert_test_report(is_template)
-    if is_template:
-        print('document template id is: %d' % doc_id)
-    else:
-        print('document instance id is: %d' % doc_id)
-    doc_id = insert_test_record(is_template)
-    if is_template:
-        print('document template id is: %d' % doc_id)
-    else:
-        print('document instance id is: %d' % doc_id)
-    doc_id = insert_spec(is_template)
-    if is_template:
-        print('document template id is: %d' % doc_id)
-    else:
-        print('document instance id is: %d' % doc_id)
-
-
 if __name__ == '__main__':
-    #clean()
-    insert_doc(True)
+    # clean()
+    # 插入回归测试记录
+    # insert_regression_record(True, '4c5dd1d2dba1428fb4af7c30e5077664')
+    # 插入回归测试计划
+    # insert_regression_plan(True, '55102128b8c44d2b8dd10cdc9a030cb9')
+    # 插入回归测试说明
+    # insert_regression_spec(True, '104e3635e8c84f288dd6763a8a6a80c9')
+    insert_test_report(True, 'e491fbeba1ad47d392615d733b12feaa')

@@ -64,7 +64,7 @@ def insert_regression_spec(is_template):
                                      '【回归测试说明】正式合格性回归测试说明',
                                      '回归测试说明 正式合格性回归测试说明')
     doc_instance.insert_header(1, '回归测试说明与回归测试计划的追踪关系')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.RegressionSpecification',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionSpecification',
                                      'getTrackRelationship',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】回归测试说明与回归测试计划的追踪关系',
@@ -76,4 +76,4 @@ def insert_regression_spec(is_template):
                                      '【回归测试说明】测试用例执行顺序',
                                      '测试用例执行顺序')
 
-    return doc_instance.instance_id
+    print(doc_instance.instance_id)
