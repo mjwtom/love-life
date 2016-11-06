@@ -16,6 +16,7 @@ def insert_regression_plan(is_template):
     doc_instance.insert_toc()
     # doc_instance.insert_break_page()
     doc_instance.insert_header(1, "范围")
+    doc_instance.insert_header(2, '标识')
     doc_instance.insert_text("a）已批准的文档标识号：${_instance_identifier}")
     doc_instance.insert_text("b）标题：${_product_softwareName}回归测试说明")
     doc_instance.insert_text("c）本文档使用的系统为${_product_systemName}，"

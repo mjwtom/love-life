@@ -16,12 +16,14 @@ def insert_regression_spec(is_template):
     doc_instance.insert_toc()
     #doc_instance.insert_break_page()
     doc_instance.insert_header(1, "范围")
+    doc_instance.insert_header(2, '标识')
     doc_instance.insert_text("a）已批准的文档标识号：${_instance_identifier}")
     doc_instance.insert_text("b）标题：${_product_softwareName}回归测试说明")
     doc_instance.insert_text("c）本文档使用的系统为${_product_systemName}，"
                              "适用的软件配置项为：${_product_softwareName}（${_instance_version}） 。")
     doc_instance.insert_header(2, '系统概述')
-    doc_instance.insert_text("这里来源于大纲的系统概述")
+    doc_instance.insert_text("${_product_softwareName}（${_instance_version}）与${_instance_version}（V1.0）的所在系统情况一致，"
+                             "参见${_instance_version}测评大纲（定型/鉴定测评大纲）。 ")
     doc_instance.insert_header(2,'文档概述')
     text = '本文档是对${_product_softwareName}行配置项测试的回归测试说明，' \
            '根据该被测软件需求规格说明、操作手册等输入条件拟制。' \
@@ -35,31 +37,43 @@ def insert_regression_spec(is_template):
                                      '【回归测试说明】引用文件表',
                                      '回归测试说明引用文件表')
     doc_instance.insert_header(1, '术语和缩略语')
-    doc_instance.insert_text("此处来源于测试大纲")
+    # 此处来源于测试大纲的术语和缩略语
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'productTermAndAbbreList',
+                                     ['projectId', 'turnId'],
+                                     '【回归测试计划】术语和缩略语表',
+                                     '回归测试计划术语和缩略语表')
     doc_instance.insert_header(1, '正式合格性测试准备')
     doc_instance.insert_header(2, '硬件资源')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.RegressionSpecification',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
                                      'getHardwareResources',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】硬件资源表',
                                      '硬件资源表')
     doc_instance.insert_header(2, '软件资源')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.RegressionSpecification',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
                                      'getSoftwareResources',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】软件资源表',
                                      '软件资源表')
-    doc_instance.insert_header(1, '回归测试说明与测评大纲的追踪关系')
+    # 由metadata统一生成，正式合格性测试说明
+    # doc_instance.insert_header(1, '正式合格性回归测试说明')
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
+                                     'getFuction',
+                                     ['projectId', 'turnId'],
+                                     '【回归测试说明】正式合格性回归测试说明',
+                                     '回归测试说明 正式合格性回归测试说明')
+    doc_instance.insert_header(1, '回归测试说明与回归测试计划的追踪关系')
     doc_instance.insert_mt_structure('com.stms.tps.doc.RegressionSpecification',
                                      'getTrackRelationship',
                                      ['projectId', 'turnId'],
-                                     '【回归测试说明】回归测试说明与测评大纲的追踪关系',
-                                     '回归测试说明与测评大纲的追踪关系')
+                                     '【回归测试说明】回归测试说明与回归测试计划的追踪关系',
+                                     '回归测试说明与回归测试计划的追踪关系')
     doc_instance.insert_header(1, '测试用例执行顺序')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.RegressionSpecification',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
                                      'getTestCaseOrder',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】测试用例执行顺序',
-                                     '6	测试用例执行顺序')
+                                     '测试用例执行顺序')
 
     return doc_instance.instance_id
