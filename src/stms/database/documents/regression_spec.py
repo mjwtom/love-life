@@ -1,7 +1,7 @@
 from doc_instance import DocInstance
 
 
-def insert_spec(is_template):
+def insert_regression_spec(is_template):
     param_map = dict(
         projectId="13",
         testTurn="1"

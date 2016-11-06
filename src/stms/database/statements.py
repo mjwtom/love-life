@@ -1,5 +1,6 @@
 import json
 from db_util import MysqlClient
+import uuid
 
 conf = dict(
     host='115.28.239.239',
@@ -12,8 +13,18 @@ conf = dict(
 
 
 def get_property_id(client, table_name):
+    id = uuid.uuid4()
+    sql = 'SELECT id FROM %s' % table_name
+    result = client.select(sql)
+    while id in result:
+        id = uuid.uuid4()
+        result = client.select(sql)
+    return id
+
+
+def get_smallest_id(client, table_name):
     ids = []
-    sql = 'select id from %s' % table_name
+    sql = 'SELECT id FROM %s' % table_name
     result = client.select(sql)
     for id, in result:
         ids.append(id)
