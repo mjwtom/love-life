@@ -34,8 +34,8 @@ def insert_test_report(is_template=False, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【测试报告】版本信息', '测试报告版本信息')
     doc_instance.insert_text('4)术语和缩略语')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getTerms',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'productTermAndAbbreList',
                                      ['projectId', 'turnId'],
                                      '【测试报告】术语和缩略语', '术语和缩略语')
     doc_instance.insert_header(2, '文档概述')
@@ -69,23 +69,23 @@ def insert_test_report(is_template=False, instance_id=None):
     #以下是引用文件
     doc_instance.insert_header(1, '引用文件')
     doc_instance.insert_header(2, '管理类文件')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getManagementDocuments',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getAdminDocList',
                                      ['projectId', 'turnId'],
                                      '【测试报告】管理类文件表格', '管理类文件表格')
     doc_instance.insert_header(2,'顶层技术文件')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getTopTechnologyDocuments',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getTopLevelDocList',
                                      ['projectId', 'turnId'],
                                      '【测试报告】顶层技术文件', '顶层技术文件表格')
     doc_instance.insert_header(2, '被测软件文档')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getSoftwareDocuments',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getProductDocList',
                                      ['projectId', 'turnId'],
                                      '【测试报告】被测软件文档', '被测软件文档')
     doc_instance.insert_header(2, '其他文档')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getOtherDocuments',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getOtherDocList',
                                      ['projectId', 'turnId'],
                                      '【测试报告】其他文档', '其他文档')
     #测评概述
@@ -112,8 +112,8 @@ def insert_test_report(is_template=False, instance_id=None):
     doc_instance.insert_header(2, '测评方法说明')
     doc_instance.insert_header(3, '测试方法')
     doc_instance.insert_text('测试组选取的测试类型和测试方法要求详见表3-12。')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getTestTypeAndMethod',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getProjectTestTypes',
                                      ['projectId', 'turnId'],
                                      '【测试报告】测试类型及测试方法',
                                      '测试类型及测试方法表格')
@@ -175,11 +175,12 @@ def insert_test_report(is_template=False, instance_id=None):
                                      '【测试报告】软件主要功能性能达标情况表',
                                      '软件主要功能性能达标情况表')
     doc_instance.insert_header(3, '测评结论')
-    doc_instance.insert_text('XXXX系统XXX软件实现了研制要求（来源于项目管理）')
+    doc_instance.insert_text('${_product_systemName}${_product_softwareName}'
+                             '实现了研制总要求、系统规格说明、软件研制任务书和'
+                             '软件需求规格说明等文档中相关的功能、性能和接口等要求；')
     doc_instance.insert_text('软件功能实现比F=100%')
     doc_instance.insert_text('软件的余量满足指标要求，如存储空间余量、处理时间余量等')
     doc_instance.insert_text('千行程序注视率为x%，满足注视率>=20%的要求')
-
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getSystemSoftware',
                                      ['projectId', 'turnId'],
