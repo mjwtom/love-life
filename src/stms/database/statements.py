@@ -24,6 +24,8 @@ def empty_instance(instance_id):
     r = client.select(sql)
     ids = [id for id, in r]
     for structure_id in ids:
+        text = 'deleting %s from docinstancestru' % structure_id
+        print(text)
         sql = 'DELETE FROM docinstancestru WHERE id=\'%s\'' % structure_id
         client.execute(sql)
     client.close()

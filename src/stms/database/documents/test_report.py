@@ -193,6 +193,7 @@ def insert_test_report(is_template=False, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【测试报告】软件问题报告单',
                                      '测试报告总结中软件问题报告单')
+    doc_instance.insert_break_page()
     doc_instance.insert_header(1, '附录B 静态分析结果')
     doc_instance.insert_header(2, '（1）编码规则检查')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
@@ -206,6 +207,7 @@ def insert_test_report(is_template=False, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【测试报告】被测软件度量元报告表',
                                      '被测软件度量元报告表')
+    doc_instance.insert_break_page()
     doc_instance.insert_header(1, '附录C 用例执行情况一览表')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getExecuteSummary',

@@ -16,7 +16,9 @@ def empty_template(template_id):
     r = client.select(sql)
     ids = [id for id, in r]
     for structure_id in ids:
-        sql = 'DELETE FROM docinstancestru WHERE id=\'%s\'' % structure_id
+        text = 'deleting %s from doctemplatestru' % structure_id
+        print(text)
+        sql = 'DELETE FROM doctemplatestru WHERE id=\'%s\'' % structure_id
         client.execute(sql)
     client.close()
     return template_id
