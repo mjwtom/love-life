@@ -14,6 +14,7 @@ class Environment(object):
         self.user='mjwtom'
         self.install_dir='install'
         self.download_dir = 'downloads'
+        self.bin = 'bin'
 
     def mkdirs(self):
         # The directory to install softwares
@@ -24,6 +25,16 @@ class Environment(object):
         path = os.path.join(self.home_dir, self.download_dir)
         if not os.path.exists(path):
             os.mkdir(path)
+        path = os.path.join(self.home_dir, self.bin)
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+    def configure_bash_profiling(self):
+        path = os.path.join(self.home_dir, '.bash_profiling')
+        with open(path, 'w') as bash_profiling:
+            bin_path = os.path.join(self.home_dir, self.bin)
+            cmd = 'export PATH='+bin_path+':$PATH'
+            bash_profiling.write(cmd)
 
     def install_vim(self):
         path = os.path.join(self.home_dir, self.download_dir)
@@ -47,6 +58,7 @@ def process():
     env.mkdirs()
     env.install_vim()
     env.configure_vim()
+    env.configure_bash_profiling()
 
 
 
