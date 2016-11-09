@@ -16,6 +16,11 @@ class Environment(object):
         self.download_dir = 'downloads'
         self.bin = 'bin'
 
+    def install_dependency(self):
+        software_list = ['libncurses5-dev']
+        cmd = 'sodo apt-install '+' '.join(software_list)
+        subprocess.call(cmd, shell=True)
+
     def mkdirs(self):
         # The directory to install softwares
         path = os.path.join(self.home_dir, self.install_dir)
@@ -46,7 +51,6 @@ class Environment(object):
         cmd = './configure --prefix='+install_path
         subprocess.call(cmd, shell=True)
         subprocess.call('make install', shell=True)
-
 
     def configure_vim(self):
         path = os.path.join(self.home_dir, self.download_dir)
