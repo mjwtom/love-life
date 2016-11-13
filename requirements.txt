@@ -1,3 +1,5 @@
 mysql_connector
-uuid
+# uuid
 # visio2img
+Django
+django-tinymce

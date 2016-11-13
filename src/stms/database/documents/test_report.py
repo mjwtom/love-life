@@ -44,8 +44,8 @@ def insert_test_report(is_template=False, instance_id=None):
     doc_instance.insert_text('文档标识本文档适用于${_product_systemName}${_product_softwareName}定型/鉴定 测评，'
                              '是${_product_systemName}${_product_softwareName}定型/鉴定 的依据 。')
     doc_instance.insert_header(2,'委托方的名称与联系方式')
-    doc_instance.insert_text('委托方的名称：${xxxx}；')
-    doc_instance.insert_text('委托方地址：XXXXXXXXXX；')
+    doc_instance.insert_text('委托方的名称：${xxxxtest}；\n委托方地址：XXXXXXXXXX；')
+    #doc_instance.insert_text('委托方地址：XXXXXXXXXX；')
     doc_instance.insert_text('委托方联系人：XXX；')
     doc_instance.insert_text('委托方联系人电话：010-XXXXXX。')
     #

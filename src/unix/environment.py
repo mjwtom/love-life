@@ -35,10 +35,13 @@ class Environment(object):
             os.mkdir(path)
 
     def configure_bash_profiling(self):
-        path = os.path.join(self.home_dir, '.bash_profiling')
+        path = os.path.join(self.home_dir, '.bash_profile')
         with open(path, 'w') as bash_profiling:
             bin_path = os.path.join(self.home_dir, self.bin)
-            cmd = 'export PATH='+bin_path+':$PATH'
+            cmd = 'export PATH='+bin_path+':$PATH'+'\n'
+            bash_profiling.write(cmd)
+            install_path = os.path.join(self.home_dir, self.install_dir)
+            cmd = 'export JAVA_HOME='+install_path+'/jdk1.8.0_111'+'\n'
             bash_profiling.write(cmd)
 
     def install_vim(self):
