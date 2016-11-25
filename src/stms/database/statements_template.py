@@ -3,6 +3,8 @@ from db_util import MysqlClient
 from statements import conf
 from statements import get_property_id
 
+global all_metadata
+all_metadata = None
 
 def empty_template(template_id):
     client = MysqlClient(conf)
@@ -24,9 +26,36 @@ def empty_template(template_id):
     return template_id
 
 
-def metadata_insert(map, name='test', digest='test', id=None):
-    url = json.dumps(map)
+def find_metadata(map):
+    global all_metadata
+    if not all_metadata:
+        client = MysqlClient(conf)
+        sql = 'SELECT id, url FROM docmetadata'
+        all_metadata = client.select(sql)
+        client.close()
+    for id, url in all_metadata:
+        url_dict = json.loads(url)
+        same = True
+        for key, value in map.items():
+            if value != url_dict.get(key):
+                same = False
+                break
+        if same:
+            return id
+    return None
 
+
+def insert_to_all_metadata(id ,map):
+    global all_metadata
+    all_metadata.append((id, map))
+
+
+def metadata_insert(map, name='test', digest='test', id=None):
+    # try to find it in the docmetadata table
+    id = find_metadata(map)
+    if id:
+        return id
+    url = json.dumps(map)
     client = MysqlClient(conf)
     if not id:
         id = get_property_id(client, 'docmetadata')
@@ -47,6 +76,7 @@ def metadata_insert(map, name='test', digest='test', id=None):
     ids = [id for id, in r]
     if id not in ids:
         print('wrong id')
+    insert_to_all_metadata(id, map)
     return id
 
 
