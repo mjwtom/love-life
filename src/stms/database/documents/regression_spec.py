@@ -1,13 +1,13 @@
 from doc_instance import DocInstance
 
 
-def insert_regression_spec(is_template):
+def insert_regression_spec(is_template, instance_id=None):
     param_map = dict(
         projectId="13",
         testTurn="1"
     )
     doc_instance = DocInstance(param_map, 13, '回归测试说明',
-                               '回归测试说明', is_template)
+                               '回归测试说明', is_template, instance_id)
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionSpecification',
                                      'getFrontPages',
                                      ['projectId', 'turnId'],
@@ -31,8 +31,8 @@ def insert_regression_spec(is_template):
            '并在此基础上设计详细的测试用例，包括测试输入设计、测试操作设计、期望测试结果等。'
     doc_instance.insert_text(text)
     doc_instance.insert_header(1, '引用文件')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionSpecification',
-                                     'getReferenceDocuments',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
+                                     'getReferenceDocList',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】引用文件表',
                                      '回归测试说明引用文件表')
@@ -59,10 +59,12 @@ def insert_regression_spec(is_template):
     # 由metadata统一生成，正式合格性测试说明
     # doc_instance.insert_header(1, '正式合格性回归测试说明')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
-                                     'getFuction',
+                                     'getProjectCases',
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】正式合格性回归测试说明',
                                      '回归测试说明 正式合格性回归测试说明')
+    doc_instance.insert_header(1, '正式合格性测试准备')
+    doc_instance.insert_text('（包含硬件资源、软件资源的获取以及其它相关准备）')
     doc_instance.insert_header(1, '回归测试说明与回归测试计划的追踪关系')
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionSpecification',
                                      'getTrackRelationship',

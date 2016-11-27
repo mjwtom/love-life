@@ -14,7 +14,7 @@ def insert_regression_record(is_template, instance_id=None):
                                      '【测试记录】回归测试记录首页',
                                      '回归测试记录首页')
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionRecord',
-                                     'getRegressionRecord',
+                                     'getTestRecords',
                                      ['projectId', 'turnId'],
                                      '【测试说明】回归测试记录首页',
                                      '回归测试记录首页')

@@ -59,7 +59,12 @@ def insert_regression_plan(is_template, instance_id=None):
     doc_instance.insert_text('按照上述测试类型选择全部可用的配置项测试用例，对${_product_softwareName}（${_instance_version}）进行回归测试。')
     doc_instance.insert_text('上述测试类型的测试要求和标识与配置项测试的测试要求和标识一致，参见${_product_softwareName}测评大纲（定型/鉴定测评大纲）。')
     doc_instance.insert_text('根据回归测试项目的实际情况，以人工测试为主，辅以相关的测试工具，采用黑盒测试和白盒测试相结合的回归测试策略。 ')
-    doc_instance.insert_header(2, '测试项及测试方法')
+    # 生成测试项及测试方法
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestOutlineImpl',
+                                     'getTestItem',
+                                     ['projectId', 'turnId'],
+                                     '【回归测试计划】测试项及测试方法',
+                                     '回归测试计划测试项及测试方法')
     doc_instance.insert_text('回归测试的测试项有如下变更，其它未变更的测试项和优先级参见${_product_softwareName}测评大纲（定型/鉴定测评大纲）。 ')
     doc_instance.insert_header(3, '文档审查（XXX_WDS）')
     doc_instance.insert_text('委托方提交的文档有如下变更：')
@@ -100,11 +105,11 @@ def insert_regression_plan(is_template, instance_id=None):
                                      '【回归测试计划】文档审查测试项内容',
                                      '回归测试计划文档审查测试项内容表')
     doc_instance.insert_header(3, 'XX测试（XXX_XXC）')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
+    '''doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getTestTypeAndMethod',
                                      ['projectId', 'turnId'],
                                      '【回归测试计划】测试类型及方法',
-                                     '回归测试计划测试类型及方法')
+                                     '回归测试计划测试类型及方法')'''
     doc_instance.insert_header(1, '测试人员安排')
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionPlan',
                                      'getWorkers',

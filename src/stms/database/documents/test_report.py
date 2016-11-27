@@ -95,8 +95,8 @@ def insert_test_report(is_template=False, instance_id=None):
                         '测评工作分为测试需求分析、测试策划、测试设计和实现、测试执行、测试总结五个测试阶段进行，测试的主要时间节点及工作内容见表3 - 1。此次定型 / 鉴定'
                         '测评分包单位为XXXX，承担${_product_softwareName}测评工作。')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
-                                     'getNodeAndWorkContent',
-                                     ['projectId', 'turnId'],
+                                     'getProjectTasks',
+                                     ['projectId'],
                                      '【测试报告】测试主要节点及工作内容', '测试主要节点及工作内容')
 
     #测评环境说明
@@ -132,7 +132,7 @@ def insert_test_report(is_template=False, instance_id=None):
     doc_instance.insert_header(2, '测试执行情况')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestReportImpl',
                                      'getExecuteResult',
-                                     ['projectId', 'turnId'],
+                                     ['projectId'],
                                      '【测试报告】测试结果执行情况总汇',
                                      '测试结果执行情况总汇')
 
@@ -174,7 +174,7 @@ def insert_test_report(is_template=False, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【测试报告】软件主要功能性能达标情况表',
                                      '软件主要功能性能达标情况表')
-    doc_instance.insert_header(3, '测评结论')
+    doc_instance.insert_header(2, '测评结论')
     doc_instance.insert_text('${_product_systemName}${_product_softwareName}'
                              '实现了研制总要求、系统规格说明、软件研制任务书和'
                              '软件需求规格说明等文档中相关的功能、性能和接口等要求；')

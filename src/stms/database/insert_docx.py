@@ -29,7 +29,8 @@ if __name__ == '__main__':
     # 插入回归测试记录
     # insert_regression_record(True, '4c5dd1d2dba1428fb4af7c30e5077664')
     # 插入回归测试计划
-    # insert_regression_plan(True, '55102128b8c44d2b8dd10cdc9a030cb9')
+    insert_regression_plan(True, '55102128b8c44d2b8dd10cdc9a030cb9')
     # 插入回归测试说明
-    # insert_regression_spec(True, '104e3635e8c84f288dd6763a8a6a80c9')
-    insert_test_report(True, 'e491fbeba1ad47d392615d733b12feaa')
+    # insert_regression_spec(True, '8ebfe0026aa441b6b678c18029e19abd')
+    # 插入测试报告
+    # insert_test_report(True, 'e491fbeba1ad47d392615d733b12feaa')
