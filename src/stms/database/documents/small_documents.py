@@ -1,13 +1,13 @@
 from doc_instance import DocInstance
 
 
-def insert_problem(is_template=False):
+def insert_problem(is_template=False, instance_id=None):
     param_map = dict(
         projectId="13",
         testTurn="1"
     )
     doc_instance = DocInstance(param_map, 13, '软件问题确认报告单',
-                               '软件问题确认报告单模板',is_template)
+                               '软件问题确认报告单模板',is_template, instance_id)
     doc_instance.insert_mt_structure('com.stms.tps.doc.form.ProblemConfirmReport',
                                      'getDocxXml',
                                      ['projectId', 'turnId'],
