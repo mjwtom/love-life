@@ -43,6 +43,7 @@ def insert_regression_spec(is_template, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【回归测试计划】术语和缩略语表',
                                      '回归测试计划术语和缩略语表')
+
     doc_instance.insert_header(1, '正式合格性测试准备')
     doc_instance.insert_header(2, '硬件资源')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
@@ -56,14 +57,12 @@ def insert_regression_spec(is_template, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【回归测试说明】软件资源表',
                                      '软件资源表')
-    # 由metadata统一生成，正式合格性测试说明
-    # doc_instance.insert_header(1, '正式合格性回归测试说明')
+    doc_instance.insert_header(1, '正式合格性测试说明')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
                                      'getProjectCases',
                                      ['projectId', 'turnId'],
-                                     '【回归测试说明】正式合格性回归测试说明',
-                                     '回归测试说明 正式合格性回归测试说明')
-    doc_instance.insert_header(1, '正式合格性测试准备')
+                                     '【回归测试说明】正式合格性测试说明',
+                                     '正式合格性测试说明')
     doc_instance.insert_text('（包含硬件资源、软件资源的获取以及其它相关准备）')
     doc_instance.insert_header(1, '回归测试说明与回归测试计划的追踪关系')
     doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionSpecification',

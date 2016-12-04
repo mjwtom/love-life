@@ -49,11 +49,12 @@ def insert_spec(is_template):
                                      ['projectId', 'turnId'],
                                      '【测试说明】软件资源表',
                                      '软件资源表')
+    doc_instance.insert_header(1, '正式合格性测试说明')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
-                                     'getFuction',
+                                     'getProjectCases',
                                      ['projectId', 'turnId'],
-                                     '【测试说明】正式合格性说明',
-                                     '正式合格性说明')
+                                     '【测试说明】正式合格性测试说明',
+                                     '正式合格性测试说明')
     doc_instance.insert_header(1, '测试说明与测评大纲的追踪关系')
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestSpecificationImpl',
                                      'getTrackRelationship',

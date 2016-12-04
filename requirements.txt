@@ -1,5 +1,8 @@
 mysql_connector
+cx_Oracle
 # uuid
 # visio2img
 Django
 django-tinymce
+paramiko
+
