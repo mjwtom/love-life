@@ -13,11 +13,11 @@ def insert_regression_record(is_template, instance_id=None):
                                      ['projectId', 'turnId'],
                                      '【测试记录】回归测试记录首页',
                                      '回归测试记录首页')
-    doc_instance.insert_mt_structure('com.stms.tps.doc.regression.RegressionRecord',
+    doc_instance.insert_mt_structure('com.stms.tps.doc.TestRecordImpl',
                                      'getTestRecords',
                                      ['projectId', 'turnId'],
-                                     '【测试说明】回归测试记录首页',
-                                     '回归测试记录首页')
+                                     '【回归测试记录】软件测试记录表格',
+                                     '软件测试记录表格')
     # 插入分页符
     doc_instance.insert_break_page()
     doc_instance.insert_mt_structure('com.stms.tps.doc.TestRecordImpl',

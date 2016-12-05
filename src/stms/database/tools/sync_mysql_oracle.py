@@ -30,5 +30,21 @@ def copy_table(table_name):
     mysql_client.close()
     oracle_client.close()
 
+
+def migate_database(source, target=None):
+    mysql_client = MysqlClient(conf)
+    oracle_client = OracleClient(oracle_conn_info)
+    sql = 'show tables'
+    tables = mysql_client.select(sql)
+    for table in tables:
+        print(table)
+        sql = 'DESC %s' % table
+        schema = mysql_client.select(sql)
+        print(schema)
+    mysql_client.close()
+    oracle_client.close()
+
+
 if __name__ == "__main__":
-    copy_table('docinstance')
+    migate_database('abc')
+    # copy_table('docinstance')
