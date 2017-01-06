@@ -1,0 +1,118 @@
+#!/bin/bash
+#*****************function*************#
+static()
+{
+    if test $[$sp%2] -eq 0
+    then
+        suwind<seq001t.su key=tracf min=10402   max=10402|suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat4a
+        suwind<seq001t.su key=tracf min=10404   max=10404|suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat4b
+        suwind<seq001t.su key=tracf min=10405   max=10405|suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat4c
+        suwind<seq001t.su key=tracf min=10408   max=10408|suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat4d
+        suwind<seq001t.su key=tracf min=10410   max=10410|suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat4e
+        suwind<seq001t.su key=tracf min=10412   max=10412|suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat4f
+        suwind<seq001t.su key=tracf min=10414   max=10414|suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat4g
+        suwind<seq001t.su key=tracf min=10415   max=10415|suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat4h
+        cat cat4a cat4b cat4c cat4d cat4e cat4f cat4g cat4h>cat4
+        s4=$(($sp+40000))
+        suchw<cat4 key1=cdp key2=cdp a=$s4>>str4
+        suwind<seq001t.su key=tracf min=10502   max=10502 |suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat5a
+        suwind<seq001t.su key=tracf min=10504   max=10504 |suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat5b
+        suwind<seq001t.su key=tracf min=10505   max=10505 |suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat5c
+        suwind<seq001t.su key=tracf min=10508   max=10508 |suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat5d
+        suwind<seq001t.su key=tracf min=10510   max=10510 |suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat5e
+        suwind<seq001t.su key=tracf min=10512   max=10512 |suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat5f
+        suwind<seq001t.su key=tracf min=10514   max=10514 |suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat5g
+        suwind<seq001t.su key=tracf min=10515   max=10515 |suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat5h
+        cat cat5a cat5b cat5c cat5d cat5e cat5f cat5g cat5h>cat5
+        s5=$(($sp+50000))
+        suchw<cat5 key1=cdp key2=cdp a=$s5>>str5
+        suwind<seq001t.su key=tracf min=10602  max=10602 |suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat6a
+        suwind<seq001t.su key=tracf min=10604  max=10604 |suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat6b
+        suwind<seq001t.su key=tracf min=10605  max=10605 |suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat6c
+        suwind<seq001t.su key=tracf min=10608  max=10608 |suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat6d
+        suwind<seq001t.su key=tracf min=10610  max=10610 |suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat6e
+        suwind<seq001t.su key=tracf min=10612  max=10612 |suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat6f
+        suwind<seq001t.su key=tracf min=10614  max=10614 |suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat6g
+        suwind<seq001t.su key=tracf min=10615  max=10615 |suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat6h
+        cat cat6a cat6b cat6c cat6d cat6e cat6f cat6g cat6h>cat6
+        s6=$(($sp+60000))
+        suchw<cat6 key1=cdp key2=cdp a=$s6>>str6
+    else
+        suwind<seq001t.su key=tracf min=10102  max=10102  |suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat1a
+        suwind<seq001t.su key=tracf min=10104  max=10104  |suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat1b
+        suwind<seq001t.su key=tracf min=10105  max=10105  |suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat1c
+        suwind<seq001t.su key=tracf min=10108  max=10108  |suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat1d
+        suwind<seq001t.su key=tracf min=10110  max=10110  |suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat1e
+        suwind<seq001t.su key=tracf min=10112  max=10112  |suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat1f
+        suwind<seq001t.su key=tracf min=10114  max=10114  |suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat1g
+        suwind<seq001t.su key=tracf min=10115  max=10115  |suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat1h
+        cat cat1a cat1b cat1c cat1d cat1e cat1f cat1g cat1h>cat1
+        s1=$(($sp+10000))
+        suchw<cat1 key1=cdp key2=cdp a=$s1>>str1
+        suwind<seq001t.su key=tracf min=10202 max=10202 |suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat2a
+        suwind<seq001t.su key=tracf min=10204 max=10204 |suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat2b
+        suwind<seq001t.su key=tracf min=10205 max=10205 |suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat2c
+        suwind<seq001t.su key=tracf min=10208 max=10208 |suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat2d
+        suwind<seq001t.su key=tracf min=10210 max=10210 |suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat2e
+        suwind<seq001t.su key=tracf min=10212 max=10212 |suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat2f
+        suwind<seq001t.su key=tracf min=10214 max=10214 |suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat2g
+        suwind<seq001t.su key=tracf min=10215 max=10215 |suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat2h
+        cat cat2a cat2b cat2c cat2d cat2e cat2f cat2g cat2h>cat2
+        s2=$(($sp+20000))
+        suchw<cat2 key1=cdp key2=cdp a=$s2>>str2
+        suwind<seq001t.su key=tracf min=10302   max=10302|suchw key1=tstat key2=tstat a=0   |sustatic hdrs=1 sign=-1>cat3a
+        suwind<seq001t.su key=tracf min=10304   max=10304|suchw key1=tstat key2=tstat a=512 |sustatic hdrs=1 sign=-1>cat3b
+        suwind<seq001t.su key=tracf min=10305   max=10305|suchw key1=tstat key2=tstat a=1024|sustatic hdrs=1 sign=-1>cat3c
+        suwind<seq001t.su key=tracf min=10308   max=10308|suchw key1=tstat key2=tstat a=1536|sustatic hdrs=1 sign=-1>cat3d
+        suwind<seq001t.su key=tracf min=10310   max=10310|suchw key1=tstat key2=tstat a=2048|sustatic hdrs=1 sign=-1>cat3e
+        suwind<seq001t.su key=tracf min=10312   max=10312|suchw key1=tstat key2=tstat a=2560|sustatic hdrs=1 sign=-1>cat3f
+        suwind<seq001t.su key=tracf min=10314   max=10314|suchw key1=tstat key2=tstat a=3072|sustatic hdrs=1 sign=-1>cat3g
+        suwind<seq001t.su key=tracf min=10315   max=10315|suchw key1=tstat key2=tstat a=3584|sustatic hdrs=1 sign=-1>cat3h
+        cat cat3a cat3b cat3c cat3d cat3e cat3f cat3g cat3h>cat3
+        s3=$(($sp+30000))
+        suchw<cat3 key1=cdp key2=cdp a=$s3>>str3
+    fi
+}
+
+# the script starts from here
+# Since I only have this script, I have to ignore some commands
+# Also, I have to simulate some programs
+
+cd /ycdata01/NFH/running
+./rmfile
+echo "please input NFH_folder"
+read FOLDER
+
+for ((i=1;i<=4000;i++));
+do
+    A=`ls -tr /win2linux/$FOLDER | tail -n 200`
+    for number in $A
+    do
+        sp1=`echo "$number"|sed ' s/.sgy//'|more`
+        myfile=" /ycdata01/NFH/running/"$sp1".sgy"
+        if [ ! -f $myfile ]
+        then
+            cp /win2linux/$FOLDER/$number  /ycdata01/NFH/running
+            rm str1 str2 str3 str4 str5 str6
+            B =`ls -tr /ycdata01/NFH/running | tail -n 200`
+            for number2 in $B
+            do
+                sp=`echo "$number2"|sed ' s/.sgy//'|more`
+                segyread tape=$number2 remap=tracf byte=213s | segyclean | suchw key1=ns key2=ns a=7168>seq001t.su
+                static
+            done
+            cat str1 str2 str3 str4 str5 str6>string
+            #rm cat*
+            #mv "$sp".sgy /ycdata01/NH/delete
+            #*********************************************
+            #else
+            # date
+        fi
+    done
+    Killid=`ps -ef|grep ximage|gawk '{print substr($0,10,6)}'`
+    #ps -ef|grep ximage|gawk '{print substr($0,10,6)}'|xargs -n1 kill  -9
+    sustack<string key=cdp |suximage perc=99 wbox=1800 hbox=900 cmap=hsv1&
+    sleep 6
+    kill -9 $Killid
+done
+

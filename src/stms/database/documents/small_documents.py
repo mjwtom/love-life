@@ -300,3 +300,17 @@ def insert_work_arrangement(is_template=False):
                                      '测试项目工作安排模板统一生文档')
     print(doc_instance.instance_id)
 
+
+def insert_project_stat(is_template=False):
+    param_map = dict(
+        projectId="13",
+        testTurn="1"
+    )
+    doc_instance = DocInstance(param_map, 13, '测试项目统计信息模版',
+                               '测试项目统计信息模版', is_template)
+    doc_instance.insert_mt_structure('com.stms.tps.doc.form.TestProjectStatForm',
+                                     'getDocxXml',
+                                     ['projectId', 'turnId'],
+                                     '测测试项目统计信息模版',
+                                     '测试项目工作安排模板统一生文档')
+    print(doc_instance.instance_id)

@@ -1,5 +1,5 @@
 mysql_connector
-cx_Oracle
+# cx_Oracle # need to locate oracle installation, so here we ignore it
 # uuid
 # visio2img
 Django
