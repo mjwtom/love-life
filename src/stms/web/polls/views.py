@@ -8,4 +8,4 @@ from polls.models import Quesion
 
 def index(request):
     question = Quesion()
-    return HttpResponse('hello')
+    return HttpResponse('!!!welcome to the application!!!')

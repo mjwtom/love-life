@@ -1,6 +1,6 @@
 from django.conf.urls import url
-import django
+from . import views
 
 urlpatterns = [
-    url(r'js/(?P<path>.*)$', django.views.static.serve, {'document_root': './templates/js'}),
+    url(r'^$', views.index, name='index'),
 ]
