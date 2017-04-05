@@ -9,8 +9,10 @@ I like to use python3 to construct the CMakeList.txt
 import os
 
 
+def todo():
+    print('please just give up')
+    pass
 
-def 
 
 def start_generate(path=None):
     if not path:
