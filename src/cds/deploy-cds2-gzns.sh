@@ -155,19 +155,19 @@ function start_servers() {
     for server in ${FOLLOWER_MASTERS};
     do
         echo "start master: ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_MASTER_DIR} && nohup ./bin/master > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_MASTER_DIR} && ./bin/master > 1.log 2>&1 < /dev/null &'"
     done
 
     for server in ${BLOCKSERVERS};
     do
         echo "start blockserver ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_BLOCKSERVER_DIR} && nohup ./bin/blockserver > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_BLOCKSERVER_DIR} && ./bin/blockserver > 1.log 2>&1 < /dev/null &'"
     done
 
     for server in ${HEAVYWORKERS};
     do
         echo "start heavyworker ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_HEAVYWORKWE_DIR} && nohup ./bin/heavyworker > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_HEAVYWORKWE_DIR} && ./bin/heavyworker > 1.log 2>&1 < /dev/null &'"
     done
 }
 
@@ -247,7 +247,7 @@ function add_resources() {
     done
 
     echo "create pool: ssd_pool"
-    cmd="add_pool --pool=ssd_pool --disk_type=ssd --rg_num=10000 --rg_goal=3 --regions=r1"
+    cmd="add_pool --pool=ssd_pool --disk_type=ssd --rg_num=1000 --rg_goal=3 --regions=r1"
     cds_tool_run ${cmd}
 
 }
