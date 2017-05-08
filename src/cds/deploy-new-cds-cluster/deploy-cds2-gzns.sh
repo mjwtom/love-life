@@ -21,13 +21,15 @@ gzns-cds-ssd079.gzns
 # small cluster for test
 # masters
 MASTERS="gzns-cds-ssd060.gzns
-gzns-cds-ssd066.gzns
-gzns-cds-ssd044.gzns"
+gzns-cds-master-gzns-01.gzns
+gzns-cds-master-gzns-02.gzns"
 # we have to start a master as the leader first (bootstrap)
 LEADER_MASTER=`echo ${MASTERS} | awk '{print $1}'`
 FOLLOWER_MASTERS=`echo ${MASTERS} | sed -r 's/^[^ ]* *//g'`
 # blockservers
-BLOCKSERVERS="gzns-cds-ssd061.gzns
+BLOCKSERVERS="gzns-cds-ssd066.gzns
+gzns-cds-ssd044.gzns
+gzns-cds-ssd061.gzns
 gzns-cds-ssd033.gzns
 gzns-cds-ssd092.gzns
 gzns-cds-ssd072.gzns
@@ -35,7 +37,12 @@ gzns-cds-ssd080.gzns
 gzns-cds-ssd039.gzns
 gzns-cds-ssd079.gzns"
 #heavyworks
-HEAVYWORKERS="gzns-cds-ssd072.gzns
+HEAVYWORKERS="gzns-cds-ssd066.gzns
+gzns-cds-ssd044.gzns
+gzns-cds-ssd061.gzns
+gzns-cds-ssd033.gzns
+gzns-cds-ssd092.gzns
+gzns-cds-ssd072.gzns
 gzns-cds-ssd080.gzns
 gzns-cds-ssd039.gzns
 gzns-cds-ssd079.gzns"
@@ -51,8 +58,8 @@ DISKS="/home/ssd1
 
 # after binding dns use the bound dns, but now, we have to use this one
 # TODO: change it to DNS
-MASTER_DNS=${LEADER_MASTER}
-#MASTER_DNS="cluster.cds.gzns.bce-internal.baidu.com"
+#MASTER_DNS=${LEADER_MASTER}
+MASTER_DNS="cluster.cds.gzns.bce-internal.baidu.com"
 MASTER_PORT=8987
 BLOCKSERVER_PORT=8977
 HEAVYWORKER_PORT=8990
@@ -61,6 +68,7 @@ CDS_TOOL_PORT=8988
 LOCAL_HOME=`pwd`
 LOCAL_BIN_DIR=${LOCAL_HOME}/output/bin
 LOCAL_CONF_DIR=${LOCAL_HOME}/output/conf
+SCRIPT_DIR=${LOCAL_HOME}/scripts
 
 REMOTE_HOME=/home/cds
 
@@ -72,11 +80,11 @@ REMOTE_BLOCKSERVER_DIR=${REMOTE_HOME}/blockserver
 REMOTE_BLOCKSERVER_BIN_DIR=${REMOTE_BLOCKSERVER_DIR}/bin
 REMOTE_BLOCKSERVER_CONF_DIR=${REMOTE_BLOCKSERVER_DIR}/conf
 
-REMOTE_HEAVYWORKWE_DIR=${REMOTE_HOME}/heavyworker
-REMOTE_HEAVYWORKWE_BIN_DIR=${REMOTE_HEAVYWORKWE_DIR}/bin
-REMOTE_HEAVYWORKER_CONF_DIR=${REMOTE_HEAVYWORKWE_DIR}/conf
+REMOTE_HEAVYWORKER_DIR=${REMOTE_HOME}/heavyworker
+REMOTE_HEAVYWORKER_BIN_DIR=${REMOTE_HEAVYWORKER_DIR}/bin
+REMOTE_HEAVYWORKER_CONF_DIR=${REMOTE_HEAVYWORKER_DIR}/conf
 
-REMOTE_CDS_TOOL_DIR=${REMOTE_HOME}/cds_tool
+REMOTE_CDS_TOOL_DIR=${REMOTE_HOME}/tool
 REMOTE_CDS_TOOL_BIN_DIR=${REMOTE_CDS_TOOL_DIR}/bin
 REMOTE_CDS_TOOL_CONF_DIR=${REMOTE_CDS_TOOL_DIR}/conf
 
@@ -123,6 +131,10 @@ function copy_files() {
         ssh cds@${server} "mkdir -p ${REMOTE_MASTER_BIN_DIR} && mkdir -p ${REMOTE_MASTER_CONF_DIR}"
         scp ${LOCAL_BIN_DIR}/master cds@${server}:${REMOTE_MASTER_BIN_DIR}
         scp ${LOCAL_CONF_DIR}/master.conf cds@${server}:${REMOTE_MASTER_CONF_DIR}
+        scp ${SCRIPT_DIR}/master/bin/control.inc cds@${server}:${REMOTE_MASTER_BIN_DIR}
+        scp ${SCRIPT_DIR}/master/bin/control.func cds@${server}:${REMOTE_MASTER_BIN_DIR}
+        scp ${SCRIPT_DIR}/master/bin/master_control cds@${server}:${REMOTE_MASTER_BIN_DIR}
+        scp ${SCRIPT_DIR}/master/conf/control.conf cds@${server}:${REMOTE_MASTER_CONF_DIR}
     done
 
     for server in ${BLOCKSERVERS};
@@ -131,14 +143,22 @@ function copy_files() {
         ssh cds@${server} "mkdir -p ${REMOTE_BLOCKSERVER_BIN_DIR} && mkdir -p ${REMOTE_BLOCKSERVER_CONF_DIR}"
         scp ${LOCAL_BIN_DIR}/blockserver cds@${server}:${REMOTE_BLOCKSERVER_BIN_DIR}
         scp ${LOCAL_CONF_DIR}/blockserver.conf cds@${server}:${REMOTE_BLOCKSERVER_CONF_DIR}
+        scp ${SCRIPT_DIR}/blockserver/bin/control.inc cds@${server}:${REMOTE_BLOCKSERVER_BIN_DIR}
+        scp ${SCRIPT_DIR}/blockserver/bin/control.func cds@${server}:${REMOTE_BLOCKSERVER_BIN_DIR}
+        scp ${SCRIPT_DIR}/blockserver/bin/blockserver_control cds@${server}:${REMOTE_BLOCKSERVER_BIN_DIR}
+        scp ${SCRIPT_DIR}/blockserver/conf/control.conf cds@${server}:${REMOTE_BLOCKSERVER_CONF_DIR}
     done
 
     for server in ${HEAVYWORKERS};
     do
         echo "copy heavyworker bin and configuration to ${server}..."
-        ssh cds@${server} "mkdir -p ${REMOTE_HEAVYWORKWE_BIN_DIR} && mkdir -p ${REMOTE_HEAVYWORKER_CONF_DIR}"
-        scp ${LOCAL_BIN_DIR}/heavyworker cds@${server}:${REMOTE_HEAVYWORKWE_BIN_DIR}
+        ssh cds@${server} "mkdir -p ${REMOTE_HEAVYWORKER_BIN_DIR} && mkdir -p ${REMOTE_HEAVYWORKER_CONF_DIR}"
+        scp ${LOCAL_BIN_DIR}/heavyworker cds@${server}:${REMOTE_HEAVYWORKER_BIN_DIR}
         scp ${LOCAL_CONF_DIR}/heavyworker.conf cds@${server}:${REMOTE_HEAVYWORKER_CONF_DIR}
+        scp ${SCRIPT_DIR}/heavyworker/bin/control.inc cds@${server}:${REMOTE_HEAVYWORKER_BIN_DIR}
+        scp ${SCRIPT_DIR}/heavyworker/bin/control.func cds@${server}:${REMOTE_HEAVYWORKER_BIN_DIR}
+        scp ${SCRIPT_DIR}/heavyworker/bin/heavyworker_control cds@${server}:${REMOTE_HEAVYWORKER_BIN_DIR}
+        scp ${SCRIPT_DIR}/heavyworker/conf/control.conf cds@${server}:${REMOTE_HEAVYWORKER_CONF_DIR}
     done
 
     echo "copy cds_tool bin and configuration to ${server}..."
@@ -150,24 +170,24 @@ function copy_files() {
 # start up
 function start_servers() {
     echo "start master: ${LEADER_MASTER} as the first master with --bootstrap"
-    ssh -f cds@${LEADER_MASTER} "sh -c 'cd ${REMOTE_MASTER_DIR} && ./bin/master --bootstrap=true > 1.log 2>&1 < /dev/null &'"
+    ssh -f cds@${LEADER_MASTER} "sh -c 'cd ${REMOTE_MASTER_DIR} && ./bin/master_control start'"
 
     for server in ${FOLLOWER_MASTERS};
     do
         echo "start master: ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_MASTER_DIR} && ./bin/master > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_MASTER_DIR} && ./bin/master_control start'"
     done
 
     for server in ${BLOCKSERVERS};
     do
         echo "start blockserver ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_BLOCKSERVER_DIR} && ./bin/blockserver > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_BLOCKSERVER_DIR} && ./bin/blockserver_control start'"
     done
 
     for server in ${HEAVYWORKERS};
     do
         echo "start heavyworker ${server}..."
-        ssh -f cds@${server} "sh -c 'cd ${REMOTE_HEAVYWORKWE_DIR} && ./bin/heavyworker > 1.log 2>&1 < /dev/null &'"
+        ssh -f cds@${server} "sh -c 'cd ${REMOTE_HEAVYWORKER_DIR} && ./bin/heavyworker_control start'"
     done
 }
 
@@ -204,6 +224,7 @@ function add_resources() {
         cmd="add_master_node --node=${ip}:${MASTER_PORT} --cur_nodes=${nodes}"
         nodes="${nodes},${ip}:${MASTER_PORT}"
         cds_tool_run ${cmd}
+	sleep 1
     done
 
     echo "add blockservers..."
@@ -231,6 +252,7 @@ function add_resources() {
         echo "add node: ${ip} to zone: ${zone}"
         cmd="add_node --node=${ip}:${BLOCKSERVER_PORT} --region=r1 --zone=${zone} --force=true"
         cds_tool_run ${cmd}
+	sleep 1
     done < "${BLOCKSERVER_ZONE_OUTPUT_FILE}"
 
 
@@ -240,16 +262,24 @@ function add_resources() {
         do
             ip="$(get_ip ${server})"
             disk_uuid="$(echo ${disk_id})"
-            cmd="add_disk --node=${ip}:${BLOCKSERVER_PORT} --disk_id=${disk_uuid} --disk_type=ssd --disk_path=${disk}"
+            cmd="add_disk --node=${ip}:${BLOCKSERVER_PORT} --disk_id=${disk_uuid} --disk_type=premium_ssd --disk_path=${disk}"
             cds_tool_run ${cmd}
             let disk_id+=1;
+	    sleep 1
         done
     done
 
     echo "create pool: ssd_pool"
-    cmd="add_pool --pool=ssd_pool --disk_type=ssd --rg_num=1000 --rg_goal=3 --regions=r1"
+    cmd="add_pool --pool=premium_ssd_pool --disk_type=premium_ssd --rg_num=10000 --rg_goal=3 --regions=r1"
     cds_tool_run ${cmd}
-
+    sleep 1
+    
+    echo "alter bos key"
+    cmd="alter_bos_key --access_key=9ed6365bb45e42d892a43fe10ea39808 --access_secret=61273988685d48c6bcb8b1ebbf1ebbcd"
+    cds_tool_run ${cmd}
+    sleep 1
+    cmd="show_bos_key"
+    cds_tool_run ${cmd}
 }
 
 function print_cluster_configuration() {
@@ -275,10 +305,12 @@ function kill_blockserver() {
 }
 
 function kill_heavyworker() {
-    ssh cds@${1} "cd ${REMOTE_HEAVYWORKWE_DIR} && killall ./bin/heavyworker"
+    ssh cds@${1} "cd ${REMOTE_HEAVYWORKER_DIR} && killall ./bin/heavyworker"
 }
 
 function kill_cds_on_node() {
+    echo "do not kill node in batch, it is an online system"
+    return
     for server in ${HEAVYWORKERS};
     do
         echo "kill heavyworker ${server}..."
@@ -305,11 +337,13 @@ function kill_cds_on_node() {
 }
 
 function destroy_data() {
+    echo "do not use destroy, it is an online system"
+    return
     for server in ${HEAVYWORKERS};
     do
         echo "remove data on ${server}..."
         ssh cds@${server} "rm -rf ${REMOTE_CDS_TOOL_DIR}"
-        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKWE_DIR}"
+        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_BLOCKSERVER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_MASTER_DIR}"
     done
@@ -318,20 +352,43 @@ function destroy_data() {
     do
         echo "remove data on ${server}..."
         ssh cds@${server} "rm -rf ${REMOTE_CDS_TOOL_DIR}"
-        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKWE_DIR}"
+        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_BLOCKSERVER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_MASTER_DIR}"
+	for disk in ${DISKS};
+	do
+		echo "remove replicas on disk ${disk}"
+        	ssh cds@${server} "rm -rf ${disk}/*"
+	done
     done
 
     for server in ${MASTERS};
     do
         echo "remove data on ${server}..."
         ssh cds@${server} "rm -rf ${REMOTE_CDS_TOOL_DIR}"
-        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKWE_DIR}"
+        ssh cds@${server} "rm -rf ${REMOTE_HEAVYWORKER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_BLOCKSERVER_DIR}"
         ssh cds@${server} "rm -rf ${REMOTE_MASTER_DIR}"
     done
 }
+
+function copy_tool() {
+    for server in ${BLOCKSERVERS};
+    do
+    echo "copy cds_tool bin and configuration to ${server}..."
+     ssh cds@${server} "mkdir -p ${REMOTE_CDS_TOOL_BIN_DIR} && mkdir -p ${REMOTE_CDS_TOOL_CONF_DIR}"
+     scp ${LOCAL_BIN_DIR}/cds_tool cds@${server}:${REMOTE_CDS_TOOL_BIN_DIR}
+     scp ${LOCAL_CONF_DIR}/tool.conf cds@${server}:${REMOTE_CDS_TOOL_CONF_DIR}
+    done
+    for server in ${MASTERS};
+    do
+    echo "copy cds_tool bin and configuration to ${server}..."
+     ssh cds@${server} "mkdir -p ${REMOTE_CDS_TOOL_BIN_DIR} && mkdir -p ${REMOTE_CDS_TOOL_CONF_DIR}"
+     scp ${LOCAL_BIN_DIR}/cds_tool cds@${server}:${REMOTE_CDS_TOOL_BIN_DIR}
+     scp ${LOCAL_CONF_DIR}/tool.conf cds@${server}:${REMOTE_CDS_TOOL_CONF_DIR}
+    done
+}
+
 
 # copy master files to masters
 function deploy() {
@@ -343,6 +400,7 @@ function deploy() {
     copy_files
     start_servers
     add_resources
+	copy_tool
 }
 
 echo "pray for that we make it..."

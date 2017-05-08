@@ -1,0 +1,47 @@
+#!/bin/bash
+#author:wanghao
+#wanghao01@baidu.com
+
+include_path=`cd $(dirname $0);pwd`
+cd $include_path
+source ${include_path}/control.inc  || exit 5
+source ${include_path}/../conf/control.conf || exit ${AOS_ERR_FILE_NOTFOUND}
+source ${include_path}/control.func || exit ${AOS_ERR_FILE_NOTFOUND}
+unset include_path
+
+#接收参数
+INTERFACE=$1
+shift
+
+#根据不同的参数选择不同的接口行为
+case "$INTERFACE" in
+        start|stop|restart|cleanup|healthcheck)
+                echo -e "running:      [${PROC_MODULE}] ${INTERFACE}" 
+                ${INTERFACE}
+                RET=$?
+                STA=`cat control.inc|grep "^AOS_"|grep $RET 2>/dev/null`
+                echo -e "return value: ${RET} ($STA)"
+                exit ${RET}
+                ;;
+        reload)
+                if [ -z "$*" ];then
+                        RET=${AOS_ERR_PARAMATER}
+                        STA=`cat control.inc|grep "^AOS_"|grep $RET 2>/dev/null`
+                        echo -e "return value: ${RET} ($STA)"
+                        exit ${AOS_ERR_PARAMATER}
+                else
+                        RELOAD_PARA=$*
+                        echo -e "running:      [${PROC_MODULE}] ${INTERFACE} ${RELOAD_PARA}"
+                        ${INTERFACE} ${RELOAD_PARA}
+                        RET=$?
+                        STA=`cat control.inc|grep "^AOS_"|grep $RET 2>/dev/null`
+                        echo -e "return value: ${RET} ($STA)"
+                        exit ${RET}
+                fi
+                ;;
+        *)
+                RET=${AOS_ERR_PARAMATER}
+                STA=`cat control.inc|grep "^AOS_"|grep $RET 2>/dev/null`
+                echo -e "return value: ${RET} ($STA)"
+                exit ${AOS_ERR_PARAMATER}
+esac
