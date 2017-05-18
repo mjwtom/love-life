@@ -395,7 +395,7 @@ function deploy() {
     #configure_file
     #copy_files
     #start_servers
-    add_resources
+    #add_resources
 	#copy_tool
 }
 
