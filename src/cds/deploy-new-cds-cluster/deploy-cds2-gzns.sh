@@ -309,8 +309,6 @@ function kill_heavyworker() {
 }
 
 function kill_cds_on_node() {
-    echo "do not kill node in batch, it is an online system"
-    return
     for server in ${HEAVYWORKERS};
     do
         echo "kill heavyworker ${server}..."
@@ -337,8 +335,6 @@ function kill_cds_on_node() {
 }
 
 function destroy_data() {
-    echo "do not use destroy, it is an online system"
-    return
     for server in ${HEAVYWORKERS};
     do
         echo "remove data on ${server}..."
@@ -393,14 +389,14 @@ function copy_tool() {
 # copy master files to masters
 function deploy() {
     print_cluster_configuration
-    kill_cds_on_node
-    destroy_data
-    get_production
-    configure_file
-    copy_files
-    start_servers
+    #kill_cds_on_node
+    #destroy_data
+    #get_production
+    #configure_file
+    #copy_files
+    #start_servers
     add_resources
-	copy_tool
+	#copy_tool
 }
 
 echo "pray for that we make it..."
