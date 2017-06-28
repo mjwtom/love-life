@@ -88,8 +88,8 @@ class Test(object):
             fout.write(os.urandom(size))
 
     def _generate_volume_data(self, path, offset, length):
-            cmd = './bin/cds_check_tool --f=%s --io_op=write --io_offset=%d --io_size=%d --volume_uuid=%s' \
-            % (path, offset, length, self._origin_volume)
+            cmd = './bin/cds_check_tool --f=%s --io_op=write --io_offset=%d --io_size=%d --l=%d --volume_uuid=%s' \
+            % (path, offset, length, length, self._origin_volume)
             subprocess.call(cmd, cwd=self._cds_tool_dir, shell=True)
 
     def _batch_generate_volume_data(self, size):
@@ -106,8 +106,16 @@ class Test(object):
         for t in threads:
             t.join()
 
+    def _serial_generate_volume_data(self, size):
+        length = 1024*1024
+        cycle = size // length
+        for i in range(cycle):
+            offset = i*length
+            path = self._origin_volume + '_' + str(offset) + '_' + str(length)
+            self._generate_volume_data(path, offset, length)
+
     def _origin_create_volume(self):
-        self._origin_volume = self._get_uuid()
+        self._origin_volume = self._get_uuid() + '-origin'
         cmd = 'create_volume --volume_uuid=%s --volume_size=50 --disk_type=ssd' \
             % self._origin_volume
         self._cds_cmd_and_check(cmd)
@@ -151,6 +159,8 @@ class Test(object):
         for volume in self._volumes:
             t = threading.Thread(target=self._delete_volume, args=(volume,))
             threads.append(t)
+        t = threading.Thread(target=self._delete_volume, args=(self._origin_volume,))
+        threads.append(t)
         for t in threads:
             t.start()
         for t in threads:
@@ -158,7 +168,8 @@ class Test(object):
 
     def run(self):
         self._origin_create_volume()
-        #self._batch_generate_volume_data(self._volume_size)
+        # self._batch_generate_volume_data(self._volume_size)
+        self._serial_generate_volume_data(self._volume_size)
         self._generate_snapshot()
         self._batch_clone(self._volume_num)
         self._clean()
