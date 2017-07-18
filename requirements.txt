@@ -6,4 +6,4 @@ Django
 django-tinymce
 paramiko
 ConfigParser
-
+matplotlib

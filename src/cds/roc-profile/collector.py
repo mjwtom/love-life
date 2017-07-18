@@ -5,6 +5,13 @@ import subprocess
 import logging
 import ConfigParser
 import time
+import json
+from datetime import datetime
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.dates import DAILY, DateFormatter, rrulewrapper, RRuleLocator, drange
+
 
 def read_config(conf_file=None):
     """
@@ -101,21 +108,34 @@ class Collector(object):
         logger.addHandler(ch)
         self._logger = logger
 
+    def _get_dst_name(self, server):
+        return '%s.output.json' % server
+
     def _collect_node_data(self, server):
         file = os.path.join(self._work_dir, self._output)
-        cmd = 'scp rd@%s:%s ./%s.output.json' \
-              % (server, file, server)
+        dst_name = self._get_dst_name(server)
+        cmd = 'scp rd@%s:%s ./%s' \
+              % (server, file, dst_name)
         subprocess.call(cmd, shell=True)
 
     def _collect_data(self):
         for server in self._servers:
             self._collect_node_data(server)
+        self._jobs = dict()
+        for server in self._servers:
+            dst_name = self._get_dst_name(server)
+            with open(dst_name) as f:
+                data = json.load(f)
+                self._jobs.update(data)
+        with open(self._output, 'w') as f:
+            json.dump(self._jobs, f)
 
     def run(self):
         self._deploy()
         self._run_client()
         self._wait_parsers()
         self._collect_data()
+        self._clean()
 
 
 def get_servers(host_path):
@@ -126,8 +146,69 @@ def get_servers(host_path):
     servers = []
     parts = out.split('\n')
     for part in parts:
+        if len(part.strip()) == 0:
+            continue
         servers.append(part.strip())
+    for server in servers:
+        print('server: %s' % server)
     return servers
+
+
+def draw2(output):
+    with open(output, 'r') as f:
+        data = json.load(f)
+    start_time_list = []
+    time_used_list = []
+    for volume in data.values():
+        start_time = volume.get('start_time')
+        time = volume.get('time_used_s')
+        if not time:
+            continue
+        time_used_list.append(time)
+        start_time_list.append(start_time)
+    figure = plt.figure()
+    val = 0.  # this is the value where you want the data to appear on the y-axis.
+    plt.plot(time_used_list, np.zeros_like(time_used_list) + val, '+')
+    plt.legend('clone time for roc v2')
+    plt.xlabel('clone time (seconds)')
+
+    with PdfPages(output+'.pdf') as pdf:
+        pdf.savefig(figure)
+
+
+def draw(output):
+    with open(output, 'r') as f:
+        data = json.load(f)
+    start_time_list = []
+    time_used_list = []
+    dates = []
+    for volume in data.values():
+        start_time = volume.get('start_time')
+        time = volume.get('time_used_s')
+        if not time:
+            continue
+        time_used_list.append(time)
+        start_time_list.append(start_time)
+        date = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S.%f")
+        dates.append(date)
+
+    # tick every 5th easter
+    rule = rrulewrapper(DAILY, interval=1)
+    loc = RRuleLocator(rule)
+    formatter = DateFormatter('%m/%d/%y')
+
+    fig, ax = plt.subplots()
+    plt.plot_date(dates, time_used_list, 'x')
+    ax.xaxis.set_major_locator(loc)
+    ax.xaxis.set_major_formatter(formatter)
+    labels = ax.get_xticklabels()
+    plt.setp(labels, rotation=30, fontsize=10)
+    #plt.legend('clone time for roc v2')
+    #plt.xlabel('date')
+    plt.ylabel('roc v2 clone time (seconds)')
+
+    with PdfPages(output+'.pdf') as pdf:
+        pdf.savefig(fig)
 
 
 def collect():
@@ -138,6 +219,7 @@ def collect():
     output = conf.get('profile', 'output')
     collector = Collector(servers, word_dir, output)
     collector.run()
+    draw(output)
 
 
 if __name__ == '__main__':
