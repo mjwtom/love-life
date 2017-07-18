@@ -252,9 +252,10 @@ def start_all():
         subprocess.call(cmd, shell=True)
 
 
-def construct():
-    print('get code and compile...')
-    code_and_compile()
+def construct(product=None):
+    if not product:
+        print('get code and compile...')
+        code_and_compile()
     print('deploy...')
     deploy()
     print('start the servers')

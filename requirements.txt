@@ -5,4 +5,5 @@ visio2img
 Django
 django-tinymce
 paramiko
+ConfigParser
 
