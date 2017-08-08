@@ -20,7 +20,7 @@ def read_config(conf_file=None):
     :return:
     """
     if not conf_file:
-        conf_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'profile.conf')
+        conf_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parser.conf')
     if not os.path.exists(conf_file):
         logging.error('configuration file does not exist')
         return -1
