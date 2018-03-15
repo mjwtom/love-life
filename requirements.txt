@@ -1,5 +1,6 @@
 mysql_connector
 # x_Oracle # need to locate oracle installation, so here we ignore it
+protobuf
 uuid
 visio2img
 Django
@@ -7,3 +8,4 @@ django-tinymce
 paramiko
 ConfigParser
 matplotlib
+protobuf3-to-dict

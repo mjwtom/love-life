@@ -18,6 +18,7 @@ def host2ip(host):
 def gather_ip(hosts):
     table = dict()
     for host in hosts:
+        host = host.strip()
         if len(host.strip()) == 0:
             continue
         ip = host2ip(host)
@@ -36,13 +37,38 @@ def print_zones(path):
 
     table = gather_ip(lines)
 
+    a = []
+    b = []
+    switch = 0
     for zone, hosts in table.items():
-        info = '%s: %d' % (zone, len(hosts))
-        print(info)
+        l = len(hosts)
+        if l % 2 == 0:
+            half = l / 2
+        else:
+            half = l / 2 + switch
+            if switch == 0:
+                switch = 1
+            elif switch == 1:
+                switch = 0
+        part1 = hosts[:half]
+        part2 = hosts[half:]
+
+        a.extend(part1)
+        b.extend(part2)
+
+    info = "a len: %d, nodes:" % len(a)
+    print(info)
+    for node in a:
+        print(node)
+
+    info = "b len: %d, nodes:" % len(b)
+    print(info)
+    for node in b:
+        print(node)
+
 
 if __name__ == '__main__':
-    #path = '/home/majingwei/servers/bjyz_sata_140.list'
-    #path = '/home/majingwei/servers/cq02_sata_140.list'
-    #path = '/home/majingwei/servers/bj_yz_ssd.list'
-    path = '/home/majingwei/servers/bj_cq_ssd.list'
+    # path = '/home/majingwei/servers/bjyz_sata_140.list'
+    # path = '/home/majingwei/servers/cq02_sata_140.list'
+    path = '/home/majingwei/servers/cq02_ssd_40_host_host.list'
     print_zones(path)
