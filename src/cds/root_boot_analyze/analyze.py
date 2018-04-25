@@ -11,7 +11,7 @@ import math
 slice_size = 1024 * 1024
 block_size = 4096
 log_dir = '/home/majingwei/download/root_read/'
-time_limit_s = 240
+time_limit_s = 100
 extent_width = 60
 
 shapes = ['o', 'v', '^', '<', '>',
@@ -177,6 +177,31 @@ def accessed_slice(ios):
     return sizes
 
 
+def continuous_io(ios):
+    out_ios = []
+    counter = []
+    o_io = None
+    offset = -1
+    c_numer = 0
+    for io in ios:
+        if io['type'] != 'read':
+            continue
+        if int(io['offset']) == offset:
+            o_io['length'] += int(io['length'])
+            c_numer += 1
+            print('find continuous read, size: %d' % o_io['length'])
+        else:
+            o_io = io
+            o_io['length'] = int(io['length'])
+            out_ios.append(o_io)
+            for i in range(len(counter), c_numer + 1):
+                counter.append(0)
+            counter[c_numer] += 1
+            c_numer = 0
+        offset = int(io['offset']) + int(io['length'])
+    return out_ios, counter
+
+
 def draw_access_slice_growth(hints, pattern):
     for i in range(len(cl)):
         title_prefix = cl[i]
@@ -257,6 +282,75 @@ def draw_io_size_distribution(hints, pattern):
     fig = plt.gcf()
     fig.set_size_inches(fig_size_inches)
     plt.savefig(pattern + '_io_size_distribution.png')
+
+
+def draw_sequential_io(hints):
+    for i in range(len(cl)):
+        title_prefix = cl[i]
+        op_sys = []
+        iops = []
+        for s in sorted(hints.keys()):
+            if not s.lower().startswith(title_prefix):
+                continue
+            op_sys.append(s)
+            volume_iops, _ = continuous_io(hints[s])
+            volume_iops = io_size_distribution(volume_iops)
+            iops.append(volume_iops)
+
+        ax = plt.subplot(fig_row, len(cl) / fig_row, i + 1)
+        for i in range(len(op_sys)):
+            volume_iops = iops[i]
+            x = range(len(volume_iops))
+            style = get_style() + '-'
+            ax.plot(x, volume_iops, style)
+        ax.set_xlim([0, int(math.log(slice_size, 2)) + 1])
+        ax.grid(True)
+        ax.set_xlabel('log(io_size, 2)')
+        ax.set_ylabel('count')
+        ax.set_title(title_prefix  + ' sequential read io_size on startup')
+        # ax.legend(op_sys, ncol=2, bbox_to_anchor=(1.05, 1), loc='best', shadow=True, fancybox=True)
+        ax.legend(op_sys, ncol=1, loc='best', shadow=True, fancybox=True)
+
+    # with PdfPages('iops.pdf') as pdf:
+        # pdf.savefig(fig)
+    fig = plt.gcf()
+    fig.set_size_inches(fig_size_inches)
+    plt.savefig('sequetial_read_io.png')
+
+
+def draw_sequential_number(hints):
+    for i in range(len(cl)):
+        title_prefix = cl[i]
+        op_sys = []
+        iops = []
+        for s in sorted(hints.keys()):
+            if not s.lower().startswith(title_prefix):
+                continue
+            op_sys.append(s)
+            _, volume_iops = continuous_io(hints[s])
+            iops.append(volume_iops)
+
+        ax = plt.subplot(fig_row, len(cl) / fig_row, i + 1)
+        for i in range(len(op_sys)):
+            volume_iops = iops[i]
+            x = range(len(volume_iops))
+            style = get_style() + '-'
+            ax.plot(x, volume_iops, style)
+        # ax.set_xlim([0, len(volume_iops)])
+        ax.set_ylim([0, 100])
+        ax.set_xlim([0, 100])
+        ax.grid(True)
+        ax.set_xlabel('countinuous read number')
+        ax.set_ylabel('count')
+        ax.set_title(title_prefix  + ' sequential read io number on startup')
+        # ax.legend(op_sys, ncol=2, bbox_to_anchor=(1.05, 1), loc='best', shadow=True, fancybox=True)
+        ax.legend(op_sys, ncol=1, loc='best', shadow=True, fancybox=True)
+
+    # with PdfPages('iops.pdf') as pdf:
+        # pdf.savefig(fig)
+    fig = plt.gcf()
+    fig.set_size_inches(fig_size_inches)
+    plt.savefig('sequetial_io_number.png')
 
 
 def draw_iops(hints, pattern):
@@ -568,6 +662,10 @@ def analyze(dir_path, type, pattern):
         io_hints[op_sys] = ios
     if type == 'fetch':
         draw_scale(io_hints)
+    if type == 'sequential_io':
+        draw_sequential_io(io_hints)
+    if type == 'sequential_number':
+        draw_sequential_number(io_hints)
     if type == 'access_slice_growth':
         draw_access_slice_growth(io_hints, pattern)
     elif type == 'hint':
