@@ -8,9 +8,7 @@ import subprocess
 import ConfigParser
 import time
 import json
-import Queue
-import threading
-from google.protobuf.json_format import MessageToJson
+
 
 class Command(object):
     """
@@ -35,15 +33,7 @@ class Command(object):
         :param out:
         :return:
         """
-        lines = out.split('\n')
-        success = False
-        for line in lines:
-            if 'errcode' in line:
-                parts = line.split(':')
-                if int(parts[-1]) == 0:
-                    success = True
-                    break
-        return success
+        return out.get('status').get('errcode') == 0
 
     def cds_cmd(self, cmd):
         """
@@ -51,16 +41,21 @@ class Command(object):
         :param cmd:
         :return:
         """
-        run_cmd = self._cds_tool + ' --master=' + self._cds_master + \
+        run_cmd = self._cds_tool + ' --print_cinder_msg=true --master=' + self._cds_master + \
                   ' --token=' + self._cds_token + ' --op=' + cmd
         self._logger.info('[[[cds_tool]]]running: ' + run_cmd)
+        print(run_cmd)
         p = subprocess.Popen(run_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         if out:
+            print(out)
             self._logger.info('[[[cds_tool]]] out:\n' + out)
         if err:
+            print(err)
             self._logger.info('[[[cds_tool]]] err:\n' + err)
-        return out, err
+        parts = out.split('[CINDER_TEXT]')
+        json_msg = parts[1]
+        return json.loads(json_msg)
 
     def cds_cmd_and_check(self, cmd):
         """
@@ -68,17 +63,14 @@ class Command(object):
         :param cmd:
         :return:
         """
-        out, err = self.cds_cmd(cmd)
+        out = self.cds_cmd(cmd)
         return self.check_cds_success(out)
 
-    def _get_job_percentage(self, info):
-        lines = info.split('\n')
-        for line in lines:
-            if '  percent:' in line:
-                parts = line.split()
-                percent = int(parts[-1])
-                return percent
-        return None
+    def _get_job_percentage(self, out, detail=False):
+        if detail:
+            return out.get('info').get('percent')
+        else:
+            return out.get('percent')
 
     def wait_job(self, job_uuid, timeout=0):
         """
@@ -90,7 +82,7 @@ class Command(object):
         start = int(time.time())
         cmd = 'get_job_status --job_uuid=%s --detail' % job_uuid
         while True:
-            out, err = self.cds_cmd(cmd)
+            out = self.cds_cmd(cmd)
             ret = self.check_cds_success(out)
             if not ret:
                 return False
@@ -101,7 +93,7 @@ class Command(object):
             self._logger.info('job: %s is done: %d' % (job_uuid, percent))
             if percent >= 100:
                 return True
-            time.sleep(5)
+            time.sleep(1)
             time_used_s = int(time.time()) - start
             self._logger.error('time_used_s %d, timeout %d' % (time_used_s, timeout))
             if time_used_s > timeout > 0:
@@ -154,7 +146,7 @@ def read_config(conf_file=None):
         conf_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cds.conf')
     if not os.path.exists(conf_file):
         logging.error('configuration file does not exist')
-        return -1
+        return None
     conf = ConfigParser.ConfigParser()
     conf.read(conf_file)
     return conf

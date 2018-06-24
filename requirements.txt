@@ -9,3 +9,5 @@ paramiko
 ConfigParser
 matplotlib
 protobuf3-to-dict
+sklearn
+pandas

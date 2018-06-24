@@ -4,11 +4,21 @@ import subprocess
 import os
 import sys
 from hashlib import md5
+import json
+import threading
+from compare_data import compare_data
 
-
-pwd = '/home/majingwei/tools'
-os.chdir(pwd)
 block_size = 64 * 1024 * 1024
+
+
+def run_cds_cmd(cmd):
+    run_cmd = './bin/cds_tool --op=%s --print_cinder_msg' % cmd
+    print(run_cmd)
+    p = subprocess.Popen(run_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    print(out)
+    parts = out.split('[CINDER_TEXT]')
+    return json.loads(parts[1])
 
 
 def pull_data(volume, offset, length, out_file):
@@ -19,63 +29,45 @@ def pull_data(volume, offset, length, out_file):
     print(cmd)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
-    if err:
-        return None
-    parts = out.split()
-    ip = parts[-1]
-    return ip
+    print(err)
+    print(out)
 
 
 def get_volume_size(volume):
-    cmd = './bin/cds_tool --op=stat_volume --volume_uuid=%s' % volume
-    print(cmd)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
-    if err:
-        return None
-    print(out)
-    lines = out.split('\n')
-    for line in lines:
-        if 'volume_size:' in line:
-            parts = line.split(':')
-            return int(parts[-1].strip())
-    return 0
+    cmd = 'stat_volume --volume_uuid=%s' % volume
+    r = run_cds_cmd(cmd)
+    return r.get('volume_info').get('volume_size')
 
 
-def compare(volume1, volume2):
-    compare_size  = get_volume_size(volume1)
-    size = get_volume_size(volume2)
-    if compare_size > size:
-        compare_size = size
-    count = compare_size / block_size
+def compare_block(lvolume, rvolume, block_index, block_size):
+    offset = block_index * block_size
+    lfile = '%s_%d_%d' % (lvolume, offset, block_size)
+    pull_data(lvolume, offset, block_size, lfile)
+    rfile = '%s_%d_%d' % (rvolume, offset, block_size)
+    pull_data(rvolume, offset, block_size, rfile)
+    with open(lfile, 'r') as lf, open(rfile, 'r') as rf:
+        ldata = lf.read()
+        rdata = rf.read()
+        if not compare_data(ldata, rdata):
+            return False
+    return True
+
+
+def compare(lvolume, rvolume):
+    l_size = get_volume_size(lvolume)
+    r_size = get_volume_size(rvolume)
+    compare_len = l_size
+    if l_size > r_size:
+        compare_len = r_size
+    count = compare_len / block_size
+    threads = []
     for i in range(count):
-        offset = i * block_size
-        file1 = '%s_%d_%d' % (volume1, offset, block_size)
-        pull_data(volume1, offset, block_size, file1)
-        file2 = '%s_%d_%d' % (volume2, offset, block_size)
-        pull_data(volume2, offset, block_size, file2)
-        with open(file1, 'r') as f1, open(file2, 'r') as f2:
-            data1 = f1.read()
-            data2 = f2.read()
-            md5_1 = md5(data1).hexdigest()
-            md5_2 = md5(data2).hexdigest()
-            if md5_1 == md5_2:
-                info = 'volume offset %d length %d equals, %s:%s %s:%s' \
-                       % (offset, block_size, volume1, md5_1, volume2, md5_2)
-                print(info)
-                os.remove(file1)
-                os.remove(file2)
-            else:
-                info = 'volume offset %d length %d not equal, %s:%s, %s:%s' \
-                       % (offset, block_size, volume1, md5_1, volume2, md5_2)
-                print(info)
-                for i in range(block_size):
-                    if data1[i] != data2[i]:
-                        offset += i
-                        info = 'volume offset %d not equal, %s:%s, %s:%s' \
-                        % (offset, volume1, data1[i], volume2, data2[i])
-                        print(info)
-                        return
+        args = (lvolume, rvolume, i, block_size)
+        t = threading.Thread(target=compare_block, args=args)
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
 
 
 if __name__ == '__main__':
