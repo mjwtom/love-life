@@ -1,5 +1,7 @@
 mysql_connector
+PyMySQL
 # x_Oracle # need to locate oracle installation, so here we ignore it
+requests
 protobuf
 uuid
 visio2img
@@ -11,3 +13,12 @@ matplotlib
 protobuf3-to-dict
 sklearn
 pandas
+beautifulsoup4
+lxml
+tushare
+sqlalchemy
+oslo.db
+oslo.log
+psycopg2
+pysqlite3
+iotest

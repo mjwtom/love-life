@@ -87,7 +87,7 @@ def process_copy(host, dst_bucket, src_bucket, backup_bucket, ak, sk,
             extent_name = extent_names[index]
             info = '%s, index: %d\n' %(extent_name, index)
             print(info)
-            args = (host, dst_bucket, src_bucket, backup_bucket, ak, sk, extent_name)
+            args = (host, dst_bucket, src_bucket, backup_bucket, ak, sk, extent_name, retry_num)
             t = threading.Thread(target=process_extent, args=args)
             t.start()
             threads.append(t)
@@ -124,7 +124,7 @@ def copy_snapshot():
     sk = conf.get('GLOBAL', 'bos_sk')
     snapshot = conf.get('GLOBAL', 'snapshot')
     batch_size = conf.get('GLOBAL', 'batch_size')
-    process_copy(host, dst_bucket, src_bucket, backup_bucket, ak, sk, snapshot, batch_size)
+    process_copy(host, dst_bucket, src_bucket, backup_bucket, ak, sk, snapshot, 10, int(batch_size))
 
 
 if __name__ =='__main__':

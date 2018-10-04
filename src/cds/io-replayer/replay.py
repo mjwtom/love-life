@@ -6,14 +6,20 @@ import string
 import json
 
 
+buf_size = 100*1024*1024
+
+with open("/dev/urandom", "rb") as f:
+    buf = f.read(buf_size)
+
+
 def id_generator(size=1024):
-    return open("/dev/urandom", "rb").read(size)
+    return buf[:size]
 
 
 def replay(device, io_file):
     with open(io_file, 'r') as f:
         ios = json.load(f)
-    with open(device, 'r+') as f:
+    with open(device, 'r+', 0) as f:
         for io in ios:
             f.seek(int(io.get('offset')))
             if io.get('type') == 'read':
