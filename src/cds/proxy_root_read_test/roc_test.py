@@ -84,8 +84,8 @@ def test():
     dev = attach_volume(iscsi_shell_dir, cmd, volume_uuid)
     print(dev)
     replay(dev, 'io.json')
-    detach_volume(iscsi_shell_dir, cmd, volume_uuid)
-    delete_root_volume(cmd, volume_uuid)
+    # detach_volume(iscsi_shell_dir, cmd, volume_uuid)
+    # delete_root_volume(cmd, volume_uuid)
 
 
 if __name__ == '__main__':
