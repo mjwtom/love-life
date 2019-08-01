@@ -12,4 +12,5 @@ def int2ip(net_int):
 
 if __name__ == '__main__':
     # print(int2ip(sys.argv[1]))
-    print((int2ip(505298698)))
+    # print((int2ip(505298698)))
+    print((int2ip(-1671454454)))
