@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 
 fast_start_time_str = '20190723 16:00:00.000000'
@@ -47,6 +48,7 @@ def get_date_range_snapshot(start, end, snapshots,
 
 def average_time_s(snapshots):
     sum_s = 0.0
+    volume_size_gb = 0.0
     num = 0
     for snap in snapshots.values():
         if snap.get('status') != 'available':
@@ -55,8 +57,27 @@ def average_time_s(snapshots):
         start_datetime = str2datetime(snap.get('created_at'))
         end_datetime = str2datetime(snap.get('updated_at'))
         sum_s += (end_datetime - start_datetime).total_seconds()
+        volume_size_gb += snap.get('volume_size')
         num += 1
-    return sum_s, num, sum_s / num
+    return sum_s, num, sum_s / num, sum_s / volume_size_gb
+
+
+def plot(snapshots, name):
+    x = []
+    y = []
+    for snap in snapshots.values():
+        if snap.get('status') != 'available':
+            continue
+        start_datetime = str2datetime(snap.get('created_at'))
+        end_datetime = str2datetime(snap.get('updated_at'))
+        y.append((end_datetime - start_datetime).total_seconds())
+        x.append(1)
+    fig, ax = plt.subplots()
+    ax.set_ylim(0, 2000)
+    ax.plot(x, y, 'x')
+    plt.savefig(name+'.png')
+    with PdfPages(name+'.pdf') as pdf:
+        pdf.savefig(fig)
 
 
 def draw_figure():
@@ -72,10 +93,12 @@ def draw_figure():
                                              volume_size_begin, volume_size_end)
     compare_snapshots = get_date_range_snapshot(compare_start_datetime, compare_end_datetime, snapshots,
                                                 volume_size_begin, volume_size_end)
-    fast_total, fast_num, fast_average_time_s = average_time_s(fast_snapshots)
-    compare_total, compare_num, compare_average_time_s = average_time_s(compare_snapshots)
-    print(fast_total, fast_num, fast_average_time_s)
-    print(compare_total, compare_num, compare_average_time_s)
+    fast_total, fast_num, fast_average_time_s, s_gb = average_time_s(fast_snapshots)
+    compare_total, compare_num, compare_average_time_s, c_gb = average_time_s(compare_snapshots)
+    print(fast_total, fast_num, fast_average_time_s, s_gb)
+    print(compare_total, compare_num, compare_average_time_s, c_gb)
+    plot(fast_snapshots, 'fast-snapshot')
+    plot(compare_snapshots, 'compare-snapshot')
 
 
 if __name__ == '__main__':

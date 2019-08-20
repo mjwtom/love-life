@@ -1,0 +1,42 @@
+syntax="proto2";
+package bce.cds;
+option cc_generic_services = true;
+
+// copy from inf/ds/ebs, MUST same
+message BackupPbHeader {
+    required uint32 type          = 1;
+    required uint32 compress_type = 2;
+    optional bytes  bitmap        = 3;
+    repeated string object_names  = 4;
+    optional uint32 offset        = 5;
+    optional uint32 data_size     = 6;
+    optional uint64 lrsn          = 7;
+}
+
+// copy from evm.proto, MUST same
+message SnapshotPbHeader {
+    required string     snap_id         = 1;
+    required string     snap_parent     = 2;
+    required uint64     snap_size_gb    = 3;
+    required uint64     extent_size_mb  = 4;
+    repeated ExtentPb   extent_pb       = 5;
+    optional uint64     stripe_width_kb = 6;
+    optional uint64     stripe_count    = 7;
+}
+
+message ExtentPb {
+    required uint64 extent_offset       = 1;
+    required string extent_object_name  = 2;
+}
+
+message ExtentPbHeader {
+    required string   snap_id           = 1;
+    required uint64   extent_offset     = 2;
+    required uint64   slice_size_mb     = 3;
+    repeated SlicePb  slice_pb          = 4;
+}
+
+message SlicePb {
+    required uint64 slice_offset        = 1;
+    required string slice_object_name   = 2;
+}
