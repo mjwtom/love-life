@@ -2,6 +2,30 @@
 import random
 
 
+class RandomWriteGenerator(object):
+    def __init__(self, volume_size, write_size):
+        self.volume_size = volume_size
+        self.write_size = write_size
+
+    def generate_offset(self):
+        return random.randint(0, int(self.volume_size/self.write_size)-1)
+
+
+class GaussWriteGenerator(object):
+    def __init__(self, volume_size, write_size, mu, sigma):
+        self.volume_size = volume_size
+        self.write_size = write_size
+        self.mu = mu/write_size
+        self.sigma = sigma/write_size
+
+    def generate_offset(self):
+        offset = -1
+        while offset < 0 or offset >= self.volume_size/self.write_size:
+            offset = random.gauss(self.mu, self.sigma)
+        offset = int(offset)
+        return offset
+
+
 class Segment(object):
     def __init__(self, seg_id, max_blk_num):
         self.count = 0
@@ -13,7 +37,9 @@ class Segment(object):
         self.data[pos] = -1
 
     def write(self, offset):
+        pos = len(self.data)
         self.data.append(offset)
+        return pos
 
     def free_num(self):
         num = 0
@@ -21,6 +47,9 @@ class Segment(object):
             if val == -1:
                 num += 1
         return num
+
+    def is_full(self):
+        return len(self.data) >= self.max_blk_num
 
 
 class AppendSim(object):
@@ -55,15 +84,11 @@ class AppendSim(object):
         self.segment_index = 1
         self.current_seg = Segment(self.segment_index, self.seg_blk_num)
         self.segment_map[self.segment_index] = self.current_seg
-        self.seg_pos = 0
-        self.write_seg_index = self.segment_index
 
         # compaction_seg
         self.segment_index += 1
         self.compaction_seg = Segment(self.segment_index, self.seg_blk_num)
         self.segment_map[self.segment_index] = self.compaction_seg
-        self.compaction_seg_pos = 0
-        self.compaction_seg_index = self.segment_index
 
         # metrics
         self.write_count = 0
@@ -72,8 +97,9 @@ class AppendSim(object):
         self.pre_compaction_count = 0
 
     def get_write_pos(self):
-        if self.distribution:
+        if not self.distribution:
             return random.randint(0, int(self.S/self.s) - 1)
+        return self.distribution.generate_offset()
 
     def check(self):
         for seg in self.segment_map.values():
@@ -151,55 +177,60 @@ class AppendSim(object):
             segment = self.segment_map.get(pre)
             segment.invalid(pos)
 
+    def new_segment(self):
+        self.segment_index += 1
+        print('new seg: %d' % self.segment_index)
+        seg = Segment(self.segment_index, self.seg_blk_num)
+        self.segment_map[self.segment_index] = seg
+        return seg
+
     def write(self, offset):
         self.invalid_pre_write(offset)
-        if self.seg_pos >= self.seg_blk_num:
-            self.segment_index += 1
-            print('new write seg: %d' % self.segment_index)
-            self.current_seg = Segment(self.segment_index, self.seg_blk_num)
-            self.segment_map[self.segment_index] = self.current_seg
-            self.write_seg_index = self.segment_index
-            self.seg_pos = 0
-        self.current_seg.write(offset)
-        self.pre_write_seg[offset] = (self.write_seg_index, self.seg_pos)
-        self.seg_pos += 1
+        if self.current_seg.is_full():
+            self.current_seg = self.new_segment()
+        seg_pos = self.current_seg.write(offset)
+        self.pre_write_seg[offset] = (self.current_seg.seg_id, seg_pos)
 
     def compaction_write(self, offset):
         if not self.compaction_to_diff_seg:
             self.write(offset)
             return
         self.invalid_pre_write(offset)
-        if self.compaction_seg_pos >= self.seg_blk_num:
-            self.segment_index += 1
-            print('new compaction seg: %d' % self.segment_index)
-            self.compaction_seg = Segment(self.segment_index, self.seg_blk_num)
-            self.segment_map[self.segment_index] = self.compaction_seg
-            self.compaction_seg_index = self.segment_index
-            self.compaction_seg_pos = 0
-        self.compaction_seg.write(offset)
-        self.pre_write_seg[offset] = (self.compaction_seg_index, self.compaction_seg_pos)
-        self.compaction_seg_pos += 1
+        if self.compaction_seg.is_full():
+            self.compaction_seg = self.new_segment()
+        seg_pos = self.compaction_seg.write(offset)
+        self.pre_write_seg[offset] = (self.compaction_seg.seg_id, seg_pos)
+
+    def write_at(self, offset):
+        self.write(offset)
+        self.write_count += 1
+        while len(self.segment_map) * self.M > self.P * self.u:
+            self.compaction()
 
     def process(self):
         # start to write
         self.write_count = 0
         while True:
             offset = self.get_write_pos()
-            self.write(offset)
-            self.write_count += 1
-            while len(self.segment_map) * self.M > self.P * self.u:
-                self.compaction()
+            self.write_at(offset)
 
 
 def simulate():
-    sim = AppendSim(distribution=True # writes distribution
-                    , s=4 * 1024  # write size
-                    , o=0.9  # oversell rate
-                    , P=48 * 1024 * 1024 * 1024  # physical size
-                    , M=16 * 1024 * 1024  # segment size
-                    , u=0.8  # compaction start point
+    P = 48 * 1024 * 1024   # physical size
+    s = 4 * 1024  # write size
+    o = 0.8  # oversell rate
+    M = 16 * 1024 * 1024
+    u = 0.9
+    distribution = RandomWriteGenerator(int(P*o), s)
+    distribution = GaussWriteGenerator(int(P*o), s, int(P*o)/2, int(P*o)/10)
+    sim = AppendSim(distribution=distribution # writes distribution
+                    , s=s
+                    , o=o
+                    , P=P
+                    , M=M
+                    , u=u
                     , compaction_to_diff_seg=True
-                    , check_after_compaction=False
+                    , check_after_compaction=True
                        )
     sim.process()
 
